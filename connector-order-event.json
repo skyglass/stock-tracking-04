@@ -1,0 +1,20 @@
+{
+  "name": "order-service-event-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "topic.prefix": "order-service",
+    "key.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "key.converter.schemas.enable": "false",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "database.hostname": "order-postgres",
+    "database.port": "5433",
+    "database.user": "postgres", 
+    "database.password": "postgres",
+    "database.dbname" : "order-db",
+    "database.server.name": "order-postgres",
+    "table.include.list": "public.order_event",
+    "message.key.columns": "public.order_event:order_id",
+    "skipped.operations": "u,d,t"
+  }
+}
