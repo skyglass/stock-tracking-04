@@ -1,23 +1,19 @@
 package net.greeta.stock.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import net.greeta.stock.common.domain.valueobject.OrderId;
 import net.greeta.stock.common.domain.valueobject.OrderStatus;
 import net.greeta.stock.common.domain.valueobject.PaymentStatus;
 import net.greeta.stock.domain.dto.message.PaymentResponse;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.event.OrderPaidEvent;
-import net.greeta.stock.domain.exception.OrderDomainException;
 import net.greeta.stock.domain.exception.OrderNotFoundException;
 import net.greeta.stock.domain.mapper.OrderDataMapper;
-import net.greeta.stock.domain.outbox.model.approval.OrderApprovalOutboxMessage;
 import net.greeta.stock.domain.outbox.model.payment.OrderPaymentOutboxMessage;
-import net.greeta.stock.domain.outbox.scheduler.approval.ApprovalOutboxHelper;
 import net.greeta.stock.domain.outbox.scheduler.payment.PaymentOutboxHelper;
 import net.greeta.stock.domain.ports.output.repository.OrderRepository;
-import net.greeta.stock.outbox.OutboxStatus;
 import net.greeta.stock.saga.SagaStatus;
 import net.greeta.stock.saga.SagaStep;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,20 +31,17 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
     private final OrderDomainService orderDomainService;
     private final OrderRepository orderRepository;
     private final PaymentOutboxHelper paymentOutboxHelper;
-    private final ApprovalOutboxHelper approvalOutboxHelper;
     private final OrderSagaHelper orderSagaHelper;
     private final OrderDataMapper orderDataMapper;
 
     public OrderPaymentSaga(OrderDomainService orderDomainService,
                             OrderRepository orderRepository,
                             PaymentOutboxHelper paymentOutboxHelper,
-                            ApprovalOutboxHelper approvalOutboxHelper,
                             OrderSagaHelper orderSagaHelper,
                             OrderDataMapper orderDataMapper) {
         this.orderDomainService = orderDomainService;
         this.orderRepository = orderRepository;
         this.paymentOutboxHelper = paymentOutboxHelper;
-        this.approvalOutboxHelper = approvalOutboxHelper;
         this.orderSagaHelper = orderSagaHelper;
         this.orderDataMapper = orderDataMapper;
     }
@@ -75,13 +68,6 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
         paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
                 domainEvent.getOrder().getOrderStatus(), sagaStatus));
 
-        approvalOutboxHelper
-                .saveApprovalOutboxMessage(orderDataMapper.orderPaidEventToOrderApprovalEventPayload(domainEvent),
-                        domainEvent.getOrder().getOrderStatus(),
-                        sagaStatus,
-                        OutboxStatus.STARTED,
-                        UUID.fromString(paymentResponse.getSagaId()));
-
         log.info("Order with id: {} is paid", domainEvent.getOrder().getId().getValue());
     }
 
@@ -107,11 +93,6 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
 
         paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
                 order.getOrderStatus(), sagaStatus));
-
-        if (paymentResponse.getPaymentStatus() == PaymentStatus.CANCELLED) {
-            approvalOutboxHelper.save(getUpdatedApprovalOutboxMessage(paymentResponse.getSagaId(),
-                    order.getOrderStatus(), sagaStatus));
-        }
 
         log.info("Order with id: {} is cancelled", order.getId().getValue());
     }
@@ -148,8 +129,7 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
     private SagaStatus[] getCurrentSagaStatus(PaymentStatus paymentStatus) {
         return switch (paymentStatus) {
             case COMPLETED -> new SagaStatus[] { SagaStatus.STARTED };
-            case CANCELLED -> new SagaStatus[] { SagaStatus.PROCESSING };
-            case FAILED -> new SagaStatus[] { SagaStatus.STARTED, SagaStatus.PROCESSING };
+            case FAILED -> new SagaStatus[] { SagaStatus.STARTED };
         };
     }
 
@@ -159,23 +139,5 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
         orderDomainService.cancelOrder(order, paymentResponse.getFailureMessages());
         orderRepository.save(order);
         return order;
-    }
-
-    private OrderApprovalOutboxMessage getUpdatedApprovalOutboxMessage(String sagaId,
-                                                                       OrderStatus orderStatus,
-                                                                       SagaStatus sagaStatus) {
-        Optional<OrderApprovalOutboxMessage> orderApprovalOutboxMessageResponse =
-                approvalOutboxHelper.getApprovalOutboxMessageBySagaIdAndSagaStatus(
-                        UUID.fromString(sagaId),
-                        SagaStatus.COMPENSATING);
-        if (orderApprovalOutboxMessageResponse.isEmpty()) {
-            throw new OrderDomainException("Approval outbox message could not be found in " +
-                    SagaStatus.COMPENSATING.name() + " status!");
-        }
-        OrderApprovalOutboxMessage orderApprovalOutboxMessage = orderApprovalOutboxMessageResponse.get();
-        orderApprovalOutboxMessage.setProcessedAt(ZonedDateTime.now(ZoneId.of(UTC)));
-        orderApprovalOutboxMessage.setOrderStatus(orderStatus);
-        orderApprovalOutboxMessage.setSagaStatus(sagaStatus);
-        return orderApprovalOutboxMessage;
     }
 }

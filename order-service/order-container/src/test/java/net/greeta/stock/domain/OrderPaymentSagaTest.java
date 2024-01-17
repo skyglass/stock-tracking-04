@@ -100,7 +100,7 @@ public class OrderPaymentSagaTest {
     private void assertPaymentOutbox() {
         Optional<PaymentOutboxEntity> paymentOutboxEntity =
                 paymentOutboxJpaRepository.findByTypeAndSagaIdAndSagaStatusIn(ORDER_SAGA_NAME, SAGA_ID,
-                        List.of(SagaStatus.PROCESSING));
+                        List.of(SagaStatus.STARTED));
         assertTrue(paymentOutboxEntity.isPresent());
     }
 

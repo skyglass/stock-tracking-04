@@ -38,13 +38,9 @@ public class OrderSagaHelper {
     SagaStatus orderStatusToSagaStatus(OrderStatus orderStatus) {
         switch (orderStatus) {
             case PAID:
-                return SagaStatus.PROCESSING;
-            case APPROVED:
                 return SagaStatus.SUCCEEDED;
-            case CANCELLING:
-                return SagaStatus.COMPENSATING;
             case CANCELLED:
-                return SagaStatus.COMPENSATED;
+                return SagaStatus.FAILED;
             default:
                 return SagaStatus.STARTED;
         }

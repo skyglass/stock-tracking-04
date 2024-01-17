@@ -1,8 +1,8 @@
 package net.greeta.stock.messaging.listener.kafka;
 
 import net.greeta.stock.kafka.consumer.KafkaConsumer;
-import net.greeta.stock.kafka.order.avro.model.CustomerAvroModel;
 import net.greeta.stock.domain.ports.input.message.listener.customer.CustomerMessageListener;
+import net.greeta.stock.kafka.order.avro.model.CustomerAvroModel;
 import net.greeta.stock.messaging.mapper.OrderMessagingDataMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

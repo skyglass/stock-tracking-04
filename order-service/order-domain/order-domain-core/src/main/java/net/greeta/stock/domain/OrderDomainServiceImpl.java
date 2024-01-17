@@ -32,19 +32,6 @@ public class OrderDomainServiceImpl implements OrderDomainService {
     }
 
     @Override
-    public void approveOrder(Order order) {
-        order.approve();
-        log.info("Order with id: {} is approved", order.getId().getValue());
-    }
-
-    @Override
-    public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
-        order.initCancel(failureMessages);
-        log.info("Order payment is cancelling for order id: {}", order.getId().getValue());
-        return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
-    }
-
-    @Override
     public void cancelOrder(Order order, List<String> failureMessages) {
         order.cancel(failureMessages);
         log.info("Order with id: {} is cancelled", order.getId().getValue());

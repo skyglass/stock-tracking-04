@@ -77,37 +77,6 @@ public class PaymentRequestHelper {
                 UUID.fromString(paymentRequest.getSagaId()));
     }
 
-    @Transactional
-    public void persistCancelPayment(PaymentRequest paymentRequest) {
-        if (publishIfOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.CANCELLED)) {
-            log.info("An outbox message with saga id: {} is already saved to database!",
-                    paymentRequest.getSagaId());
-            return;
-        }
-
-        log.info("Received payment rollback event for order id: {}", paymentRequest.getOrderId());
-        Optional<Payment> paymentResponse = paymentRepository
-                .findByOrderId(UUID.fromString(paymentRequest.getOrderId()));
-        if (paymentResponse.isEmpty()) {
-            log.error("Payment with order id: {} could not be found!", paymentRequest.getOrderId());
-            throw new PaymentNotFoundException("Payment with order id: " +
-                    paymentRequest.getOrderId() + " could not be found!");
-        }
-        Payment payment = paymentResponse.get();
-        CreditEntry creditEntry = getCreditEntry(payment.getCustomerId());
-        List<CreditHistory> creditHistories = getCreditHistory(payment.getCustomerId());
-        List<String> failureMessages = new ArrayList<>();
-        PaymentEvent paymentEvent = paymentDomainService
-                .validateAndCancelPayment(payment, creditEntry, creditHistories, failureMessages);
-        persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
-
-        orderOutboxHelper.saveOrderOutboxMessage(paymentDataMapper.paymentEventToOrderEventPayload(paymentEvent),
-                paymentEvent.getPayment().getPaymentStatus(),
-                OutboxStatus.STARTED,
-                UUID.fromString(paymentRequest.getSagaId()));
-
-    }
-
     private CreditEntry getCreditEntry(CustomerId customerId) {
         Optional<CreditEntry> creditEntry = creditEntryRepository.findByCustomerId(customerId);
         if (creditEntry.isEmpty()) {

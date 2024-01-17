@@ -1,12 +1,12 @@
 package net.greeta.stock.messaging.listener.kafka;
 
+import lombok.extern.slf4j.Slf4j;
+import net.greeta.stock.domain.exception.OrderNotFoundException;
+import net.greeta.stock.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
 import net.greeta.stock.kafka.consumer.KafkaConsumer;
 import net.greeta.stock.kafka.order.avro.model.PaymentResponseAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentStatus;
-import net.greeta.stock.domain.exception.OrderNotFoundException;
-import net.greeta.stock.domain.ports.input.message.listener.payment.PaymentResponseMessageListener;
 import net.greeta.stock.messaging.mapper.OrderMessagingDataMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -47,8 +47,7 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<PaymentRespon
                     log.info("Processing successful payment for order id: {}", paymentResponseAvroModel.getOrderId());
                     paymentResponseMessageListener.paymentCompleted(orderMessagingDataMapper
                             .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));
-                } else if (PaymentStatus.CANCELLED == paymentResponseAvroModel.getPaymentStatus() ||
-                        PaymentStatus.FAILED == paymentResponseAvroModel.getPaymentStatus()) {
+                } else if (PaymentStatus.FAILED == paymentResponseAvroModel.getPaymentStatus()) {
                     log.info("Processing unsuccessful payment for order id: {}", paymentResponseAvroModel.getOrderId());
                     paymentResponseMessageListener.paymentCancelled(orderMessagingDataMapper
                             .paymentResponseAvroModelToPaymentResponse(paymentResponseAvroModel));

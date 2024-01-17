@@ -1,17 +1,16 @@
 package net.greeta.stock.payment.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import net.greeta.stock.common.domain.valueobject.Money;
 import net.greeta.stock.common.domain.valueobject.PaymentStatus;
 import net.greeta.stock.payment.domain.entity.CreditEntry;
-import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.entity.CreditHistory;
 import net.greeta.stock.payment.domain.entity.Payment;
-import net.greeta.stock.payment.domain.event.PaymentCancelledEvent;
 import net.greeta.stock.payment.domain.event.PaymentCompletedEvent;
+import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.event.PaymentFailedEvent;
 import net.greeta.stock.payment.domain.valueobject.CreditHistoryId;
 import net.greeta.stock.payment.domain.valueobject.TransactionType;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -44,26 +43,6 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
             payment.updateStatus(PaymentStatus.FAILED);
             return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(UTC)), failureMessages);
         }
-    }
-
-    @Override
-    public PaymentEvent validateAndCancelPayment(Payment payment,
-                                                 CreditEntry creditEntry,
-                                                 List<CreditHistory> creditHistories,
-                                                 List<String> failureMessages) {
-        payment.validatePayment(failureMessages);
-        addCreditEntry(payment, creditEntry);
-        updateCreditHistory(payment, creditHistories, TransactionType.CREDIT);
-
-       if (failureMessages.isEmpty()) {
-           log.info("Payment is cancelled for order id: {}", payment.getOrderId().getValue());
-           payment.updateStatus(PaymentStatus.CANCELLED);
-           return new PaymentCancelledEvent(payment, ZonedDateTime.now(ZoneId.of(UTC)));
-       } else {
-           log.info("Payment cancellation is failed for order id: {}", payment.getOrderId().getValue());
-           payment.updateStatus(PaymentStatus.FAILED);
-           return new PaymentFailedEvent(payment, ZonedDateTime.now(ZoneId.of(UTC)), failureMessages);
-       }
     }
 
     private void validateCreditEntry(Payment payment, CreditEntry creditEntry, List<String> failureMessages) {
@@ -119,7 +98,4 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
                 .reduce(Money.ZERO, Money::add);
     }
 
-    private void addCreditEntry(Payment payment, CreditEntry creditEntry) {
-        creditEntry.addCreditAmount(payment.getPrice());
-    }
 }

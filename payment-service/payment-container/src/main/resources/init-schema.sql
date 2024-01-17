@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 DROP TYPE IF EXISTS payment_status;
 
-CREATE TYPE payment_status AS ENUM ('COMPLETED', 'CANCELLED', 'FAILED');
+CREATE TYPE payment_status AS ENUM ('COMPLETED', 'FAILED');
 
 DROP TABLE IF EXISTS "payment".payments CASCADE;
 
