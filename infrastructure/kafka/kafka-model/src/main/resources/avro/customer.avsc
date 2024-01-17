@@ -1,5 +1,5 @@
 {
-  "namespace": "net.greeta.order.kafka.order.avro.model",
+  "namespace": "net.greeta.stock.kafka.order.avro.model",
   "type": "record",
   "name": "CustomerAvroModel",
   "fields": [

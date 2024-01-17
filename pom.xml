@@ -31,8 +31,9 @@
         <module>core</module>
         <module>common</module>
         <module>infrastructure</module>
-        <module>product-service</module>
+        <module>customer-service</module>
         <module>order-service</module>
+        <module>payment-service</module>
         <module>gateway-service</module>
         <module>e2e-service</module>
     </modules>
@@ -76,22 +77,48 @@
             </dependency>
             <dependency>
                 <groupId>net.greeta.stock</groupId>
-                <artifactId>product-domain-core</artifactId>
+                <artifactId>payment-domain-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.greeta.stock</groupId>
-                <artifactId>product-application-service</artifactId>
+                <artifactId>payment-application-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.greeta.stock</groupId>
-                <artifactId>product-dataaccess</artifactId>
+                <artifactId>payment-dataaccess</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.greeta.stock</groupId>
-                <artifactId>product-messaging</artifactId>
+                <artifactId>payment-messaging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
+                <artifactId>customer-domain-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
+                <artifactId>customer-application-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
+                <artifactId>customer-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
+                <artifactId>customer-dataaccess</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
+                <artifactId>customer-messaging</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -103,11 +130,6 @@
             <dependency>
                 <groupId>net.greeta.stock</groupId>
                 <artifactId>common-application</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.greeta.stock</groupId>
-                <artifactId>common-dataaccess</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -130,7 +152,6 @@
                 <artifactId>kafka-config-data</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
 
 
 
