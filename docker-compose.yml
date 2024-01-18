@@ -172,6 +172,34 @@ services:
     networks:
       - stock
 
+  init-kafka:
+    image: confluentinc/cp-kafka:7.1.0
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # block until kafka is reachable
+      kafka-topics --bootstrap-server stock-kafka1:9092 --list
+
+      echo -e 'Deleting kafka topics'
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-request --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-response --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic customer --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic debezium.order.payment_outbox --delete --if-exists
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic debezium.payment.order_outbox --delete --if-exists
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-request --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-response --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic customer --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic debezium.order.payment_outbox --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic debezium.payment.order_outbox --replication-factor 3 --partitions 3
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka-broker-1:9092 --list
+      "
+    networks:
+      - stock
+
   kafka-ui:
     image: provectuslabs/kafka-ui
     container_name: kafka-ui
