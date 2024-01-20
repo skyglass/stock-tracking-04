@@ -4,7 +4,7 @@ import net.greeta.stock.kafka.order.avro.model.PaymentRequestAvroModel;
 import net.greeta.stock.kafka.producer.KafkaMessageHelper;
 import net.greeta.stock.kafka.producer.service.KafkaProducer;
 import net.greeta.stock.domain.config.OrderServiceConfigData;
-import net.greeta.stock.domain.outbox.model.payment.OrderPaymentEventPayload;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.domain.outbox.model.payment.OrderPaymentOutboxMessage;
 import net.greeta.stock.domain.ports.output.message.publisher.payment.PaymentRequestMessagePublisher;
 import net.greeta.stock.messaging.mapper.OrderMessagingDataMapper;

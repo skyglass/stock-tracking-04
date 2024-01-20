@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.greeta.stock.common.domain.valueobject.PaymentStatus;
 import net.greeta.stock.outbox.OutboxStatus;
 import net.greeta.stock.payment.domain.exception.PaymentDomainException;
-import net.greeta.stock.payment.domain.outbox.model.OrderEventPayload;
+import net.greeta.stock.common.domain.event.payload.PaymentOrderEventPayload;
 import net.greeta.stock.payment.domain.outbox.model.OrderOutboxMessage;
 import net.greeta.stock.payment.domain.ports.output.repository.OrderOutboxRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class OrderOutboxHelper {
     }
 
     @Transactional
-    public void saveOrderOutboxMessage(OrderEventPayload orderEventPayload,
+    public void saveOrderOutboxMessage(PaymentOrderEventPayload orderEventPayload,
                                        PaymentStatus paymentStatus,
                                        OutboxStatus outboxStatus,
                                        UUID sagaId) {
@@ -75,7 +75,7 @@ public class OrderOutboxHelper {
         log.info("Order outbox table status is updated as: {}", outboxStatus.name());
     }
 
-    private String createPayload(OrderEventPayload orderEventPayload) {
+    private String createPayload(PaymentOrderEventPayload orderEventPayload) {
         try {
             return objectMapper.writeValueAsString(orderEventPayload);
         } catch (JsonProcessingException e) {

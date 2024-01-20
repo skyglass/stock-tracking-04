@@ -1,32 +1,38 @@
 package net.greeta.stock.messaging.mapper;
 
+import debezium.payment.order_outbox.Value;
+import net.greeta.stock.common.domain.event.payload.PaymentOrderEventPayload;
+import net.greeta.stock.common.domain.valueobject.PaymentStatus;
 import net.greeta.stock.domain.dto.message.CustomerModel;
 import net.greeta.stock.domain.dto.message.PaymentResponse;
-import net.greeta.stock.domain.outbox.model.payment.OrderPaymentEventPayload;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.kafka.order.avro.model.CustomerAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentOrderStatus;
 import net.greeta.stock.kafka.order.avro.model.PaymentRequestAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentResponseAvroModel;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
 public class OrderMessagingDataMapper {
 
-    public PaymentResponse paymentResponseAvroModelToPaymentResponse(PaymentResponseAvroModel
+    public PaymentResponse paymentResponseAvroModelToPaymentResponse(PaymentOrderEventPayload
+                                                                             paymentOrderEventPayload,
+                                                                     Value
                                                                              paymentResponseAvroModel) {
         return PaymentResponse.builder()
                 .id(paymentResponseAvroModel.getId())
                 .sagaId(paymentResponseAvroModel.getSagaId())
-                .paymentId(paymentResponseAvroModel.getPaymentId())
-                .customerId(paymentResponseAvroModel.getCustomerId())
-                .orderId(paymentResponseAvroModel.getOrderId())
-                .price(paymentResponseAvroModel.getPrice())
-                .createdAt(paymentResponseAvroModel.getCreatedAt())
-                .paymentStatus(net.greeta.stock.common.domain.valueobject.PaymentStatus.valueOf(
-                        paymentResponseAvroModel.getPaymentStatus().name()))
-                .failureMessages(paymentResponseAvroModel.getFailureMessages())
+                .paymentId(paymentOrderEventPayload.getPaymentId())
+                .customerId(paymentOrderEventPayload.getCustomerId())
+                .orderId(paymentOrderEventPayload.getOrderId())
+                .price(paymentOrderEventPayload.getPrice())
+                .createdAt(Instant.parse(paymentResponseAvroModel.getCreatedAt()))
+                .paymentStatus(PaymentStatus.valueOf(
+                        paymentOrderEventPayload.getPaymentStatus()))
+                .failureMessages(paymentOrderEventPayload.getFailureMessages())
                 .build();
     }
 

@@ -7,9 +7,9 @@ networks:
 services:
   # Applications
 
-  product:
-    image: "product-service"
-    container_name: "product"
+  customer:
+    image: "customer-service"
+    container_name: "customer"
     ports:
       - 9001:9001
       - 8001:8001
@@ -76,9 +76,9 @@ services:
     networks:
       - stock
 
-  product2:
-    image: "product-service"
-    container_name: "product2"
+  payment:
+    image: "payment-service"
+    container_name: "payment"
     ports:
       - 9005:9005
       - 8005:8005
@@ -104,8 +104,7 @@ services:
       # Buildpacks environment variable to enable debug through a socket on port 8000
       - BPL_DEBUG_ENABLED=true
       - BPL_DEBUG_PORT=8000
-      - PRODUCT_SERVICE_URL=http://product:9001
-      - PRODUCT2_SERVICE_URL=http://product2:9005
+      - CUSTOMER_SERVICE_URL=http://customer:9001
       - ORDER_SERVICE_URL=http://order:9002
       - ORDER2_SERVICE_URL=http://order2:9003
       - ORDER3_SERVICE_URL=http://order3:9004

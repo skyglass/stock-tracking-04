@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>net.greeta.stock</groupId>
+            <artifactId>common-messaging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.greeta.stock</groupId>
             <artifactId>kafka-producer</artifactId>
         </dependency>
         <dependency>

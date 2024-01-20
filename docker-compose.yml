@@ -8,35 +8,24 @@ services:
   
   # Backing Services
 
-  order-postgres:
+  stock-postgres:
     image: debezium/postgres:15
-    container_name: order-db
-    hostname: order-db
+    container_name: stock-postgres
+    hostname: stock-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: order-db
       PGPORT: 5433
+    command:
+      - "postgres"
+      - "-c"
+      - "max_connections=200"
+      - "-c"
+      - "max_replication_slots=2"
     volumes:
-      - ./volumes/postgresql/order-postgres:/var/lib/postgresql/data
+      - "./volumes/postgres/stock-postgres:/var/lib/postgresql/data"
     ports:
       - 5433:5433
-    networks:
-      - stock
-
-  product-postgres:
-    image: debezium/postgres:15
-    container_name: product-db
-    hostname: product-db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: product-db
-      PGPORT: 5434
-    volumes:
-      - ./volumes/postgresql/product-postgres:/var/lib/postgresql/data
-    ports:
-      - 5434:5434
     networks:
       - stock
 
@@ -135,6 +124,8 @@ services:
       ADVERTISED_HOST_NAME: stock-kafka1
       JMXPORT: 9011
       JMXHOST: stock-kafka1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_COMPRESSION_TYPE: producer
     depends_on:
       - stock-zookeeper
     volumes:
@@ -163,6 +154,8 @@ services:
       ADVERTISED_HOST_NAME: stock-kafka2
       JMXPORT: 9011
       JMXHOST: stock-kafka2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_COMPRESSION_TYPE: producer
     depends_on:
       - stock-zookeeper
     volumes:
@@ -172,30 +165,47 @@ services:
     networks:
       - stock
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.1.0
+    hostname: schema-registry
+    depends_on:
+      - stock-kafka1
+      - stock-kafka2
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'stock-zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://stock-kafka1:29092,LISTENER_LOCAL://localhost:9092
+      SCHEMA_REGISTRY_DEBUG: 'true'
+    networks:
+      - stock
+
   init-kafka:
     image: confluentinc/cp-kafka:7.1.0
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
       "
       # block until kafka is reachable
-      kafka-topics --bootstrap-server stock-kafka1:9092 --list
+      kafka-topics --bootstrap-server stock-kafka1:29092 --list
 
       echo -e 'Deleting kafka topics'
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-request --delete --if-exists
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic payment-response --delete --if-exists
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic customer --delete --if-exists
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic debezium.order.payment_outbox --delete --if-exists
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --topic debezium.payment.order_outbox --delete --if-exists
+      kafka-topics --bootstrap-server stock-kafka1:29092 --topic payment-request --delete --if-exists
+      kafka-topics --bootstrap-server stock-kafka1:29092 --topic payment-response --delete --if-exists
+      kafka-topics --bootstrap-server stock-kafka1:29092 --topic customer --delete --if-exists
+      kafka-topics --bootstrap-server stock-kafka1:29092 --topic debezium.order.payment_outbox --delete --if-exists
+      kafka-topics --bootstrap-server stock-kafka1:29092 --topic debezium.payment.order_outbox --delete --if-exists
 
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-request --replication-factor 3 --partitions 3
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic payment-response --replication-factor 3 --partitions 3
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic customer --replication-factor 3 --partitions 3
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic debezium.order.payment_outbox --replication-factor 3 --partitions 3
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --create --if-not-exists --topic debezium.payment.order_outbox --replication-factor 3 --partitions 3
+      kafka-topics --bootstrap-server stock-kafka1:29092 --create --if-not-exists --topic payment-request --replication-factor 2 --partitions 2
+      kafka-topics --bootstrap-server stock-kafka1:29092 --create --if-not-exists --topic payment-response --replication-factor 2 --partitions 2
+      kafka-topics --bootstrap-server stock-kafka1:29092 --create --if-not-exists --topic customer --replication-factor 2 --partitions 2
+      kafka-topics --bootstrap-server stock-kafka1:29092 --create --if-not-exists --topic debezium.order.payment_outbox --replication-factor 2 --partitions 2
+      kafka-topics --bootstrap-server stock-kafka1:29092 --create --if-not-exists --topic debezium.payment.order_outbox --replication-factor 2 --partitions 2
 
       echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server kafka-broker-1:9092 --list
+      kafka-topics --bootstrap-server stock-kafka1:29092 --list
       "
     networks:
       - stock
@@ -221,7 +231,7 @@ services:
     container_name: stock-connect
     restart: always
     ports:
-      - 8071:8083
+      - 8083:8083
     environment:
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: connect_configs
@@ -230,8 +240,17 @@ services:
       BOOTSTRAP_SERVERS: "stock-kafka1:29092,stock-kafka2:29093"
       JMXPORT: 9012
       JMXHOST: stock-connect
+      LOGGING_LEVEL: "DEBUG"
+      CONNECT_SCHEMA_NAME_ADJUSTMENT_MODE: avro
+      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
+      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
     depends_on:
       - stock-kafka1
       - stock-kafka2
+      - schema-registry
+    volumes:
+      - "./docker-conf/debezium-connector-schemaregistry-7.2.5:/kafka/connect/debezium-connector-schemaregistry-7.2.5"
     networks:
       - stock

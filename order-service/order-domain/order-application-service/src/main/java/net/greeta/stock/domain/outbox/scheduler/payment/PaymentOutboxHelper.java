@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.greeta.stock.common.domain.valueobject.OrderStatus;
 import net.greeta.stock.domain.exception.OrderDomainException;
-import net.greeta.stock.domain.outbox.model.payment.OrderPaymentEventPayload;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.domain.outbox.model.payment.OrderPaymentOutboxMessage;
 import net.greeta.stock.domain.ports.output.repository.PaymentOutboxRepository;
 import net.greeta.stock.outbox.OutboxStatus;

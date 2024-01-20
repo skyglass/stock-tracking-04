@@ -1,27 +1,30 @@
 package net.greeta.stock.payment.messaging.mapper;
 
+import debezium.order.payment_outbox.Value;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.common.domain.valueobject.PaymentOrderStatus;
-import net.greeta.stock.kafka.order.avro.model.PaymentRequestAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentResponseAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentStatus;
 import net.greeta.stock.payment.domain.dto.PaymentRequest;
 import net.greeta.stock.payment.domain.outbox.model.OrderEventPayload;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
 public class PaymentMessagingDataMapper {
 
-    public PaymentRequest paymentRequestAvroModelToPaymentRequest(PaymentRequestAvroModel paymentRequestAvroModel) {
+    public PaymentRequest paymentRequestAvroModelToPaymentRequest(OrderPaymentEventPayload orderPaymentEventPayload,
+                                                                  Value paymentRequestAvroModel) {
         return PaymentRequest.builder()
                 .id(paymentRequestAvroModel.getId())
                 .sagaId(paymentRequestAvroModel.getSagaId())
-                .customerId(paymentRequestAvroModel.getCustomerId())
-                .orderId(paymentRequestAvroModel.getOrderId())
-                .price(paymentRequestAvroModel.getPrice())
-                .createdAt(paymentRequestAvroModel.getCreatedAt())
-                .paymentOrderStatus(PaymentOrderStatus.valueOf(paymentRequestAvroModel.getPaymentOrderStatus().name()))
+                .customerId(orderPaymentEventPayload.getCustomerId())
+                .orderId(orderPaymentEventPayload.getOrderId())
+                .price(orderPaymentEventPayload.getPrice())
+                .createdAt(Instant.parse(paymentRequestAvroModel.getCreatedAt()))
+                .paymentOrderStatus(PaymentOrderStatus.valueOf(orderPaymentEventPayload.getPaymentOrderStatus()))
                 .build();
     }
 

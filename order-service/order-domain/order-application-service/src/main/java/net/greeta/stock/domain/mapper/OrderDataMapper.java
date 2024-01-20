@@ -11,7 +11,7 @@ import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.event.OrderCancelledEvent;
 import net.greeta.stock.domain.event.OrderCreatedEvent;
-import net.greeta.stock.domain.outbox.model.payment.OrderPaymentEventPayload;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

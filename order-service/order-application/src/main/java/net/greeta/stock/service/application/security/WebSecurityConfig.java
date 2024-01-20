@@ -25,7 +25,7 @@ public class WebSecurityConfig {
 
                         .requestMatchers(HttpMethod.GET,"/", "/**").permitAll()
 
-                        .requestMatchers("/", "/**").hasRole(ORDER_MANAGER)
+                        .requestMatchers("/", "/**").hasRole(STOCK_MANAGER)
 
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(
@@ -35,6 +35,6 @@ public class WebSecurityConfig {
                 .build();
     }
 
-    public static final String ORDER_MANAGER = "ORDER_MANAGER";
-    public static final String ORDER_USER = "ORDER_USER";
+    public static final String STOCK_MANAGER = "STOCK_MANAGER";
+    public static final String STOCK_USER = "STOCK_USER";
 }

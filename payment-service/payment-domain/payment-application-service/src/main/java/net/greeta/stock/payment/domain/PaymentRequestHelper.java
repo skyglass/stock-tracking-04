@@ -1,5 +1,6 @@
 package net.greeta.stock.payment.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.common.domain.valueobject.PaymentStatus;
 import net.greeta.stock.outbox.OutboxStatus;
@@ -9,15 +10,12 @@ import net.greeta.stock.payment.domain.entity.CreditHistory;
 import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.exception.PaymentApplicationServiceException;
-import net.greeta.stock.payment.domain.exception.PaymentNotFoundException;
 import net.greeta.stock.payment.domain.mapper.PaymentDataMapper;
 import net.greeta.stock.payment.domain.outbox.model.OrderOutboxMessage;
-import net.greeta.stock.payment.domain.ports.output.message.publisher.PaymentResponseMessagePublisher;
+import net.greeta.stock.payment.domain.outbox.scheduler.OrderOutboxHelper;
 import net.greeta.stock.payment.domain.ports.output.repository.CreditEntryRepository;
 import net.greeta.stock.payment.domain.ports.output.repository.CreditHistoryRepository;
 import net.greeta.stock.payment.domain.ports.output.repository.PaymentRepository;
-import net.greeta.stock.payment.domain.outbox.scheduler.OrderOutboxHelper;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,27 +34,24 @@ public class PaymentRequestHelper {
     private final CreditEntryRepository creditEntryRepository;
     private final CreditHistoryRepository creditHistoryRepository;
     private final OrderOutboxHelper orderOutboxHelper;
-    private final PaymentResponseMessagePublisher paymentResponseMessagePublisher;
 
     public PaymentRequestHelper(PaymentDomainService paymentDomainService,
                                 PaymentDataMapper paymentDataMapper,
                                 PaymentRepository paymentRepository,
                                 CreditEntryRepository creditEntryRepository,
                                 CreditHistoryRepository creditHistoryRepository,
-                                OrderOutboxHelper orderOutboxHelper,
-                                PaymentResponseMessagePublisher paymentResponseMessagePublisher) {
+                                OrderOutboxHelper orderOutboxHelper) {
         this.paymentDomainService = paymentDomainService;
         this.paymentDataMapper = paymentDataMapper;
         this.paymentRepository = paymentRepository;
         this.creditEntryRepository = creditEntryRepository;
         this.creditHistoryRepository = creditHistoryRepository;
         this.orderOutboxHelper = orderOutboxHelper;
-        this.paymentResponseMessagePublisher = paymentResponseMessagePublisher;
     }
 
     @Transactional
     public void persistPayment(PaymentRequest paymentRequest) {
-        if (publishIfOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.COMPLETED)) {
+        if (isOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.COMPLETED)) {
             log.info("An outbox message with saga id: {} is already saved to database!",
                     paymentRequest.getSagaId());
             return;
@@ -108,14 +103,13 @@ public class PaymentRequestHelper {
         }
     }
 
-    private boolean publishIfOutboxMessageProcessedForPayment(PaymentRequest paymentRequest,
-                                                              PaymentStatus paymentStatus) {
+    private boolean isOutboxMessageProcessedForPayment(PaymentRequest paymentRequest,
+                                                       PaymentStatus paymentStatus) {
         Optional<OrderOutboxMessage> orderOutboxMessage =
                 orderOutboxHelper.getCompletedOrderOutboxMessageBySagaIdAndPaymentStatus(
                         UUID.fromString(paymentRequest.getSagaId()),
                         paymentStatus);
         if (orderOutboxMessage.isPresent()) {
-            paymentResponseMessagePublisher.publish(orderOutboxMessage.get(), orderOutboxHelper::updateOutboxMessage);
             return true;
         }
         return false;

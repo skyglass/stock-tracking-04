@@ -57,26 +57,15 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: product
-          uri: ${PRODUCT_SERVICE_URL:http://localhost:9001}
+        - id: customer
+          uri: ${CUSTOMER_SERVICE_URL:http://localhost:9001}
           predicates:
-            - Path=/product/**
+            - Path=/customer/**
           filters:
-            - RewritePath=/product/(?<path>.*), /$\{path}
+            - RewritePath=/customer/(?<path>.*), /$\{path}
             - name: CircuitBreaker
               args:
-                name: productCircuitBreaker
-                fallbackUri: forward:/stock-fallback
-
-        - id: product2
-          uri: ${PRODUCT2_SERVICE_URL:http://localhost:9005}
-          predicates:
-            - Path=/product2/**
-          filters:
-            - RewritePath=/product2/(?<path>.*), /$\{path}
-            - name: CircuitBreaker
-              args:
-                name: productCircuitBreaker
+                name: customerCircuitBreaker
                 fallbackUri: forward:/stock-fallback
 
 
@@ -205,12 +194,10 @@ springdoc:
       # - url: /v3/api-docs
       #   name: API Gateway Service
       #   primaryName: API Gateway Service
-      - url: /product/v3/api-docs
-        name: Product Service
+      - url: /customer/v3/api-docs
+        name: Customer Service
       - url: /order/v3/api-docs
         name: Order Service
-      - url: /product2/v3/api-docs
-        name: Product2 Service
       - url: /order2/v3/api-docs
         name: Order2 Service
       - url: /order3/v3/api-docs

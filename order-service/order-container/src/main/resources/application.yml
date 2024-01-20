@@ -18,9 +18,9 @@ spring:
     open-in-view: false
     show-sql: true
   datasource:
-    url: jdbc:postgresql://order-postgres:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://stock-postgres:5433/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
-    password: admin
+    password: postgres
     hikari:
       connection-timeout: 2000 #ms
       maximum-pool-size: 5
@@ -36,8 +36,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${spring.keycloak.server-external-url}/realms/order-realm
-          jwk-set-uri: ${spring.keycloak.server-url}/realms/order-realm/protocol/openid-connect/certs
+          issuer-uri: ${spring.keycloak.server-external-url}/realms/stock-realm
+          jwk-set-uri: ${spring.keycloak.server-url}/realms/stock-realm/protocol/openid-connect/certs
 
 logging:
   pattern:
@@ -54,7 +54,7 @@ info:
 jwt:
   auth:
     converter:
-      resource-id: order-app
+      resource-id: stock-app
       principal-attribute: preferred_username
 
 management:
@@ -83,20 +83,20 @@ management:
 openapi:
   oauthflow:
     authServerUrl: ${spring.keycloak.server-external-url}
-    realm: order-realm
+    realm: stock-realm
 
 
 
 order-service:
-  payment-request-topic-name: payment-request
-  payment-response-topic-name: payment-response
+  payment-request-topic-name: debezium.order.payment_outbox
+  payment-response-topic-name: debezium.payment.order_outbox
   customer-topic-name: customer
   outbox-scheduler-fixed-rate: 10000
   outbox-scheduler-initial-delay: 10000
 
 
 kafka-config:
-  bootstrap-servers: broker:29092
+  bootstrap-servers: "stock-kafka1:29092,stock-kafka2:29093"
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://schema-registry:8081
   num-of-partitions: 1

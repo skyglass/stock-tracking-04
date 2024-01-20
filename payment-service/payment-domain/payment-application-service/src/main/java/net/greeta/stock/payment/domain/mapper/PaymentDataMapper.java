@@ -6,7 +6,7 @@ import net.greeta.stock.common.domain.valueobject.OrderId;
 import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.dto.PaymentRequest;
-import net.greeta.stock.payment.domain.outbox.model.OrderEventPayload;
+import net.greeta.stock.common.domain.event.payload.PaymentOrderEventPayload;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -22,8 +22,8 @@ public class PaymentDataMapper {
                 .build();
     }
 
-    public OrderEventPayload paymentEventToOrderEventPayload(PaymentEvent paymentEvent) {
-        return OrderEventPayload.builder()
+    public PaymentOrderEventPayload paymentEventToOrderEventPayload(PaymentEvent paymentEvent) {
+        return PaymentOrderEventPayload.builder()
                 .paymentId(paymentEvent.getPayment().getId().getValue().toString())
                 .customerId(paymentEvent.getPayment().getCustomerId().getValue().toString())
                 .orderId(paymentEvent.getPayment().getOrderId().getValue().toString())

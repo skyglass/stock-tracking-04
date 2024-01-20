@@ -1,4 +1,4 @@
-package net.greeta.stock.domain.outbox.model.payment;
+package net.greeta.stock.common.domain.event.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
