@@ -15,10 +15,10 @@ spring:
             url: http://localhost:9000/order2
           order3:
             url: http://localhost:9000/order3
-          product:
-            url: http://localhost:9000/product
-          product2:
-            url: http://localhost:9000/product2
+          customer:
+            url: http://localhost:9000/customer
+          payment:
+            url: http://localhost:9000/payment
           oauth2:
             url: http://localhost:8080
 
@@ -29,14 +29,21 @@ spring:
     order:
       username: postgres
       password: postgres
-      url: jdbc:postgresql://localhost:5433/order-db
+      url: jdbc:postgresql://localhost:5433/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
       hikari:
         connection-timeout: 2000 #ms
         maximum-pool-size: 5
-    product:
+    customer:
       username: postgres
       password: postgres
-      url: jdbc:postgresql://localhost:5434/product-db
+      url: jdbc:postgresql://localhost:5433/postgres?currentSchema=customer&binaryTransfer=true&reWriteBatchedInserts=true
+      hikari:
+        connection-timeout: 2000 #ms
+        maximum-pool-size: 5
+    payment:
+      username: postgres
+      password: postgres
+      url: jdbc:postgresql://localhost:5433/postgres?currentSchema=payment&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
       hikari:
         connection-timeout: 2000 #ms
         maximum-pool-size: 5

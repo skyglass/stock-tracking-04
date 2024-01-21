@@ -1,7 +1,7 @@
 package net.greeta.stock.customer.domain.ports.input.service;
 
-import net.greeta.stock.customer.domain.create.CreateCustomerCommand;
-import net.greeta.stock.customer.domain.create.CreateCustomerResponse;
+import net.greeta.stock.common.domain.dto.CreateCustomerCommand;
+import net.greeta.stock.common.domain.dto.CreateCustomerResponse;
 
 import jakarta.validation.Valid;
 

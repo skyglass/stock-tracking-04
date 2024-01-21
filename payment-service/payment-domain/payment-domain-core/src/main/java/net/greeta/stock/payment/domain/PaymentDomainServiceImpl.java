@@ -9,6 +9,8 @@ import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentCompletedEvent;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.event.PaymentFailedEvent;
+import net.greeta.stock.payment.domain.exception.PaymentNotEnoughCreditException;
+import net.greeta.stock.payment.domain.exception.PaymentNotFoundException;
 import net.greeta.stock.payment.domain.valueobject.CreditHistoryId;
 import net.greeta.stock.payment.domain.valueobject.TransactionType;
 
@@ -26,7 +28,7 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
     public PaymentEvent validateAndInitiatePayment(Payment payment,
                                                    CreditEntry creditEntry,
                                                    List<CreditHistory> creditHistories,
-                                                   List<String> failureMessages) {
+                                                   List<String> failureMessages) throws PaymentNotEnoughCreditException {
         payment.validatePayment(failureMessages);
         payment.initializePayment();
         validateCreditEntry(payment, creditEntry, failureMessages);
@@ -49,8 +51,7 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
         if (payment.getPrice().isGreaterThan(creditEntry.getTotalCreditAmount())) {
             log.error("Customer with id: {} doesn't have enough credit for payment!",
                     payment.getCustomerId().getValue());
-            failureMessages.add("Customer with id=" + payment.getCustomerId().getValue()
-                    + " doesn't have enough credit for payment!");
+            throw new PaymentNotEnoughCreditException(payment.getCustomerId().getValue().toString());
         }
     }
 
@@ -73,22 +74,21 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
     private void validateCreditHistory(CreditEntry creditEntry,
                                        List<CreditHistory> creditHistories,
                                        List<String> failureMessages) {
-            Money totalCreditHistory = getTotalHistoryAmount(creditHistories, TransactionType.CREDIT);
-            Money totalDebitHistory = getTotalHistoryAmount(creditHistories, TransactionType.DEBIT);
+        Money totalCreditHistory = getTotalHistoryAmount(creditHistories, TransactionType.CREDIT);
+        Money totalDebitHistory = getTotalHistoryAmount(creditHistories, TransactionType.DEBIT);
 
-            if (totalDebitHistory.isGreaterThan(totalCreditHistory)) {
-                log.error("Customer with id: {} doesn't have enough credit according to credit history",
-                        creditEntry.getCustomerId().getValue());
-                failureMessages.add("Customer with id=" + creditEntry.getCustomerId().getValue() +
-                        " doesn't have enough credit according to credit history!");
-            }
+        if (totalDebitHistory.isGreaterThan(totalCreditHistory)) {
+            log.error("Customer with id: {} doesn't have enough credit according to credit history",
+                    creditEntry.getCustomerId().getValue());
+            throw new PaymentNotEnoughCreditException(creditEntry.getCustomerId().getValue().toString());
+        }
 
-            if (!creditEntry.getTotalCreditAmount().equals(totalCreditHistory.subtract(totalDebitHistory))) {
-                log.error("Credit history total is not equal to current credit for customer id: {}!",
-                        creditEntry.getCustomerId().getValue());
-                failureMessages.add("Credit history total is not equal to current credit for customer id: " +
-                        creditEntry.getCustomerId().getValue() + "!");
-            }
+        if (!creditEntry.getTotalCreditAmount().equals(totalCreditHistory.subtract(totalDebitHistory))) {
+            log.error("Credit history total is not equal to current credit for customer id: {}!",
+                    creditEntry.getCustomerId().getValue());
+            failureMessages.add("Credit history total is not equal to current credit for customer id: " +
+                    creditEntry.getCustomerId().getValue() + "!");
+        }
     }
 
     private Money getTotalHistoryAmount(List<CreditHistory> creditHistories, TransactionType transactionType) {
@@ -98,4 +98,7 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
                 .reduce(Money.ZERO, Money::add);
     }
 
+    private void addCreditEntry(Payment payment, CreditEntry creditEntry) {
+        creditEntry.addCreditAmount(payment.getPrice());
+    }
 }

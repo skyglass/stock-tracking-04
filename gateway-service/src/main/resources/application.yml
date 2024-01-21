@@ -102,6 +102,28 @@ spring:
                 name: orderCircuitBreaker
                 fallbackUri: forward:/stock-fallback
 
+        - id: payment
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:9005}
+          predicates:
+            - Path=/payment/**
+          filters:
+            - RewritePath=/payment/(?<path>.*), /$\{path}
+            - name: CircuitBreaker
+              args:
+                name: paymentCircuitBreaker
+                fallbackUri: forward:/stock-fallback
+
+        - id: payment2
+          uri: ${PAYMENT2_SERVICE_URL:http://localhost:9006}
+          predicates:
+            - Path=/payment2/**
+          filters:
+            - RewritePath=/payment2/(?<path>.*), /$\{path}
+            - name: CircuitBreaker
+              args:
+                name: paymentCircuitBreaker
+                fallbackUri: forward:/stock-fallback
+
   redis:
     connect-timeout: 20s
     host: localhost
@@ -198,6 +220,10 @@ springdoc:
         name: Customer Service
       - url: /order/v3/api-docs
         name: Order Service
+      - url: /payment/v3/api-docs
+        name: Payment Service
+      - url: /payment2/v3/api-docs
+        name: Payment2 Service
       - url: /order2/v3/api-docs
         name: Order2 Service
       - url: /order3/v3/api-docs

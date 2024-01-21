@@ -1,6 +1,6 @@
 package net.greeta.stock.customer.domain;
 
-import net.greeta.stock.customer.domain.create.CreateCustomerCommand;
+import net.greeta.stock.common.domain.dto.CreateCustomerCommand;
 import net.greeta.stock.customer.domain.entity.Customer;
 import net.greeta.stock.customer.domain.event.CustomerCreatedEvent;
 import net.greeta.stock.customer.domain.exception.CustomerDomainException;

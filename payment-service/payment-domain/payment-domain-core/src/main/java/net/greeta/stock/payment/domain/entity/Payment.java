@@ -27,8 +27,8 @@ public class Payment extends AggregateRoot<PaymentId> {
     }
 
     public void validatePayment(List<String> failureMessages) {
-        if (price == null || !price.isGreaterThanZero()) {
-            failureMessages.add("Total price must be greater than zero!");
+        if (price == null || price.isZero()) {
+            failureMessages.add("Total price must not be zero!");
         }
     }
 

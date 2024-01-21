@@ -3,10 +3,10 @@ package net.greeta.stock.domain.mapper;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.common.domain.valueobject.Money;
 import net.greeta.stock.common.domain.valueobject.PaymentOrderStatus;
-import net.greeta.stock.domain.dto.create.CreateOrderCommand;
-import net.greeta.stock.domain.dto.create.CreateOrderResponse;
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderResponse;
 import net.greeta.stock.domain.dto.message.CustomerModel;
-import net.greeta.stock.domain.dto.track.TrackOrderResponse;
+import net.greeta.stock.common.domain.dto.TrackOrderResponse;
 import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.event.OrderCancelledEvent;
@@ -22,7 +22,7 @@ public class OrderDataMapper {
     public Order createOrderCommandToOrder(CreateOrderCommand createOrderCommand) {
         return Order.builder()
                 .customerId(new CustomerId(createOrderCommand.getCustomerId()))
-                .price(new Money(createOrderCommand.getPrice()))
+                .price(new Money(createOrderCommand.getAmount()))
                 .build();
     }
 

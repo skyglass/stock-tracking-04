@@ -37,6 +37,10 @@ public class CalculationHelper {
         return compareValue1.compareTo(compareValue2);
     }
 
+    public static boolean equals(BigDecimal value1, BigDecimal value2) {
+        return equalsToScale2(value1, value2);
+    }
+
     public static boolean equalsToScale2(BigDecimal value1, BigDecimal value2) {
         return compare(value1, value2) == 0;
     }
@@ -58,10 +62,10 @@ public class CalculationHelper {
     }
 
     public static boolean isEqualToZero(BigDecimal value) {
-        return compare(value, BigDecimal.ZERO) == 0;
+        return equalsToScale2(value, BigDecimal.ZERO);
     }
 
     public static boolean notEqualsToZero(BigDecimal value) {
-        return compare(value, BigDecimal.ZERO) != 0;
+        return !isEqualToZero(value);
     }
 }

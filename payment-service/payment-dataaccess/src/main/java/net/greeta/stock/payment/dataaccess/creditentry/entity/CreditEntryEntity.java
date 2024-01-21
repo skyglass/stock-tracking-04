@@ -1,5 +1,6 @@
 package net.greeta.stock.payment.dataaccess.creditentry.entity;
 
+import jakarta.persistence.Version;
 import lombok.*;
 
 import jakarta.persistence.Entity;
@@ -22,6 +23,8 @@ public class CreditEntryEntity {
     private UUID id;
     private UUID customerId;
     private BigDecimal totalCreditAmount;
+    @Version
+    private int version;
 
     @Override
     public boolean equals(Object o) {

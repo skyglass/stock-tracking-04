@@ -1,5 +1,6 @@
 package net.greeta.stock.payment.dataaccess.creditentry.adapter;
 
+import jakarta.persistence.EntityManager;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.payment.dataaccess.creditentry.mapper.CreditEntryDataAccessMapper;
 import net.greeta.stock.payment.dataaccess.creditentry.repository.CreditEntryJpaRepository;
@@ -15,10 +16,14 @@ public class CreditEntryRepositoryImpl implements CreditEntryRepository {
     private final CreditEntryJpaRepository creditEntryJpaRepository;
     private final CreditEntryDataAccessMapper creditEntryDataAccessMapper;
 
+    private final EntityManager entityManager;
+
     public CreditEntryRepositoryImpl(CreditEntryJpaRepository creditEntryJpaRepository,
-                                     CreditEntryDataAccessMapper creditEntryDataAccessMapper) {
+                                     CreditEntryDataAccessMapper creditEntryDataAccessMapper,
+                                     EntityManager entityManager) {
         this.creditEntryJpaRepository = creditEntryJpaRepository;
         this.creditEntryDataAccessMapper = creditEntryDataAccessMapper;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -33,5 +38,10 @@ public class CreditEntryRepositoryImpl implements CreditEntryRepository {
         return creditEntryJpaRepository
                 .findByCustomerId(customerId.getValue())
                 .map(creditEntryDataAccessMapper::creditEntryEntityToCreditEntry);
+    }
+
+    @Override
+    public void detach(CustomerId customerId) {
+        entityManager.detach(creditEntryJpaRepository.findByCustomerId(customerId.getValue()).orElseThrow());
     }
 }

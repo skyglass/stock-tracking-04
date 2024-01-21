@@ -93,6 +93,23 @@ services:
     networks:
       - stock
 
+  payment2:
+    image: "payment-service"
+    container_name: "payment2"
+    ports:
+      - 9006:9006
+      - 8006:8006
+    environment:
+      - SERVER_PORT=9006
+      - BPL_JVM_THREAD_COUNT=50
+      - BPL_DEBUG_ENABLED=true
+      - BPL_DEBUG_PORT=8006
+      - SPRING_KEYCLOAK_SERVER_URL=http://stock-keycloak:8080
+      - SPRING_KEYCLOAK_SERVER_EXTERNAL_URL=http://localhost:8080
+      - ZIPKIN_HOST=zipkin
+    networks:
+      - stock
+
   gateway:
     image: "gateway-service"
     container_name: "gateway"
@@ -108,6 +125,8 @@ services:
       - ORDER_SERVICE_URL=http://order:9002
       - ORDER2_SERVICE_URL=http://order2:9003
       - ORDER3_SERVICE_URL=http://order3:9004
+      - PAYMENT_SERVICE_URL=http://payment:9005
+      - PAYMENT2_SERVICE_URL=http://payment2:9006
       - SPRING_REDIS_HOST=gateway-redis
       - SPRING_KEYCLOAK_SERVER_URL=http://stock-keycloak:8080
       - SPRING_KEYCLOAK_SERVER_EXTERNAL_URL=http://localhost:8080

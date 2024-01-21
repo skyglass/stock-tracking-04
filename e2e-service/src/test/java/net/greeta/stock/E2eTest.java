@@ -2,7 +2,8 @@ package net.greeta.stock;
 
 import lombok.SneakyThrows;
 import net.greeta.stock.order.OrderTestDataService;
-import net.greeta.stock.product.ProductTestDataService;
+import net.greeta.stock.customer.CustomerTestDataService;
+import net.greeta.stock.payment.PaymentTestDataService;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,12 +15,16 @@ public abstract class E2eTest {
     private OrderTestDataService orderTestDataService;
 
     @Autowired
-    private ProductTestDataService productTestDataService;
+    private CustomerTestDataService customerTestDataService;
+
+    @Autowired
+    private PaymentTestDataService paymentTestDataService;
 
     @BeforeEach
     @SneakyThrows
     void cleanup() {
+        customerTestDataService.resetDatabase();
         orderTestDataService.resetDatabase();
-        productTestDataService.resetDatabase();
+        paymentTestDataService.resetDatabase();
     }
 }

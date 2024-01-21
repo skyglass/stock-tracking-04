@@ -10,6 +10,7 @@ import net.greeta.stock.payment.domain.entity.CreditHistory;
 import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.exception.PaymentApplicationServiceException;
+import net.greeta.stock.payment.domain.exception.PaymentNotFoundException;
 import net.greeta.stock.payment.domain.mapper.PaymentDataMapper;
 import net.greeta.stock.payment.domain.outbox.model.OrderOutboxMessage;
 import net.greeta.stock.payment.domain.outbox.scheduler.OrderOutboxHelper;
@@ -50,11 +51,11 @@ public class PaymentRequestHelper {
     }
 
     @Transactional
-    public void persistPayment(PaymentRequest paymentRequest) {
+    public boolean persistPayment(PaymentRequest paymentRequest) {
         if (isOutboxMessageProcessedForPayment(paymentRequest, PaymentStatus.COMPLETED)) {
             log.info("An outbox message with saga id: {} is already saved to database!",
                     paymentRequest.getSagaId());
-            return;
+            return true;
         }
 
         log.info("Received payment complete event for order id: {}", paymentRequest.getOrderId());
@@ -64,12 +65,30 @@ public class PaymentRequestHelper {
         List<String> failureMessages = new ArrayList<>();
         PaymentEvent paymentEvent =
                 paymentDomainService.validateAndInitiatePayment(payment, creditEntry, creditHistories, failureMessages);
-        persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
 
-        orderOutboxHelper.saveOrderOutboxMessage(paymentDataMapper.paymentEventToOrderEventPayload(paymentEvent),
-                paymentEvent.getPayment().getPaymentStatus(),
-                OutboxStatus.STARTED,
-                UUID.fromString(paymentRequest.getSagaId()));
+        return persistIfSucceeded(paymentRequest, payment, creditEntry, creditHistories, failureMessages, paymentEvent);
+    }
+
+    private boolean persistIfSucceeded(PaymentRequest paymentRequest, Payment payment, CreditEntry creditEntry, List<CreditHistory> creditHistories, List<String> failureMessages, PaymentEvent paymentEvent) {
+        boolean isSucceeded = true;
+        if (failureMessages.isEmpty()) {
+            int version = creditEntry.getVersion();
+            creditEntryRepository.detach(payment.getCustomerId());
+            creditEntry = getCreditEntry(payment.getCustomerId());
+            isSucceeded = version == creditEntry.getVersion();
+        } else {
+            isSucceeded = false;
+        }
+
+        if (isSucceeded) {
+            persistDbObjects(payment, creditEntry, creditHistories, failureMessages);
+            orderOutboxHelper.saveOrderOutboxMessage(paymentDataMapper.paymentEventToOrderEventPayload(paymentEvent),
+                    paymentEvent.getPayment().getPaymentStatus(),
+                    OutboxStatus.STARTED,
+                    UUID.fromString(paymentRequest.getSagaId()));
+        }
+
+        return isSucceeded;
     }
 
     private CreditEntry getCreditEntry(CustomerId customerId) {

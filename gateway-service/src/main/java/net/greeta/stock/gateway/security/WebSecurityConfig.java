@@ -43,6 +43,12 @@ public class WebSecurityConfig {
                         .pathMatchers(HttpMethod.GET,"/order3/v3/api-docs/**").permitAll()
                         .pathMatchers("/order3", "/order3/**").permitAll()
 
+                        .pathMatchers(HttpMethod.GET,"/payment/v3/api-docs/**").permitAll()
+                        .pathMatchers("/payment", "/payment/**").permitAll()
+
+                        .pathMatchers(HttpMethod.GET,"/payment2/v3/api-docs/**").permitAll()
+                        .pathMatchers("/payment2", "/payment2/**").permitAll()
+
                         .anyExchange().authenticated()
                         .and()
                         //.exceptionHandling(exceptionHandling -> exceptionHandling

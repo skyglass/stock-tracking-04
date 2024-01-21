@@ -1,7 +1,7 @@
 package net.greeta.stock.domain;
 
 import net.greeta.stock.domain.dto.track.TrackOrderQuery;
-import net.greeta.stock.domain.dto.track.TrackOrderResponse;
+import net.greeta.stock.common.domain.dto.TrackOrderResponse;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.exception.OrderNotFoundException;
 import net.greeta.stock.domain.mapper.OrderDataMapper;

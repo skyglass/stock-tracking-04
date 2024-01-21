@@ -29,6 +29,16 @@ spring:
       mode: ALWAYS
       schema-locations: classpath:init-schema.sql,classpath:init-data.sql
 
+  keycloak:
+    server-url: http://localhost:8080
+    server-external-url: http://localhost:8080
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${spring.keycloak.server-external-url}/realms/stock-realm
+          jwk-set-uri: ${spring.keycloak.server-url}/realms/stock-realm/protocol/openid-connect/certs
+
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"
@@ -40,6 +50,12 @@ logging:
 
 info:
   system: Payment Service
+
+jwt:
+  auth:
+    converter:
+      resource-id: stock-app
+      principal-attribute: preferred_username
 
 management:
   endpoints:
@@ -62,6 +78,11 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
+
+openapi:
+  oauthflow:
+    authServerUrl: ${spring.keycloak.server-external-url}
+    realm: stock-realm
 
 payment-service:
   payment-request-topic-name: debezium.order.payment_outbox

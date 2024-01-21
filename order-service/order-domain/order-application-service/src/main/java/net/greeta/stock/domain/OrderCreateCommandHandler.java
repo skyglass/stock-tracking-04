@@ -1,7 +1,7 @@
 package net.greeta.stock.domain;
 
-import net.greeta.stock.domain.dto.create.CreateOrderCommand;
-import net.greeta.stock.domain.dto.create.CreateOrderResponse;
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderResponse;
 import net.greeta.stock.domain.event.OrderCreatedEvent;
 import net.greeta.stock.domain.mapper.OrderDataMapper;
 import net.greeta.stock.domain.outbox.scheduler.payment.PaymentOutboxHelper;

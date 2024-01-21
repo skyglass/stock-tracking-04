@@ -1,7 +1,7 @@
 package net.greeta.stock.order;
 
-import net.greeta.stock.order.dto.OrderCreateDto;
-import net.greeta.stock.order.dto.OrderSummaryDto;
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,5 +10,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface Order3Client {
 
     @PostMapping("/")
-    public OrderSummaryDto create(@RequestBody OrderCreateDto order);
+    public CreateOrderResponse createOrder(@RequestBody CreateOrderCommand order);
 }

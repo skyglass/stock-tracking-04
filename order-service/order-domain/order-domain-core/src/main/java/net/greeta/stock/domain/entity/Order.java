@@ -62,8 +62,8 @@ public class Order extends AggregateRoot<OrderId> {
     }
 
     private void validateTotalPrice() {
-        if (price == null || !price.isGreaterThanZero()) {
-            throw new OrderDomainException("Total price must be greater than zero!");
+        if (price == null || price.isZero()) {
+            throw new OrderDomainException("Total price must not be zero!");
         }
     }
 

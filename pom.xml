@@ -87,6 +87,11 @@
             </dependency>
             <dependency>
                 <groupId>net.greeta.stock</groupId>
+                <artifactId>payment-application</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.greeta.stock</groupId>
                 <artifactId>payment-dataaccess</artifactId>
                 <version>${project.version}</version>
             </dependency>

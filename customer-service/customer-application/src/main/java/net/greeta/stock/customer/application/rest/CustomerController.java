@@ -1,7 +1,7 @@
 package net.greeta.stock.customer.application.rest;
 
-import net.greeta.stock.customer.domain.create.CreateCustomerCommand;
-import net.greeta.stock.customer.domain.create.CreateCustomerResponse;
+import net.greeta.stock.common.domain.dto.CreateCustomerCommand;
+import net.greeta.stock.common.domain.dto.CreateCustomerResponse;
 import net.greeta.stock.customer.domain.ports.input.service.CustomerApplicationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

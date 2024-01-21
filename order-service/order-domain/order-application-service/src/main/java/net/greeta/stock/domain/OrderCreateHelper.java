@@ -1,6 +1,6 @@
 package net.greeta.stock.domain;
 
-import net.greeta.stock.domain.dto.create.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
 import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.event.OrderCreatedEvent;

@@ -1,7 +1,7 @@
 package net.greeta.stock.customer.domain.mapper;
 
-import net.greeta.stock.customer.domain.create.CreateCustomerCommand;
-import net.greeta.stock.customer.domain.create.CreateCustomerResponse;
+import net.greeta.stock.common.domain.dto.CreateCustomerCommand;
+import net.greeta.stock.common.domain.dto.CreateCustomerResponse;
 import net.greeta.stock.customer.domain.entity.Customer;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import org.springframework.stereotype.Component;

@@ -1,12 +1,12 @@
 package net.greeta.stock.customer.domain;
 
 
-import net.greeta.stock.customer.domain.create.CreateCustomerCommand;
+import net.greeta.stock.common.domain.dto.CreateCustomerCommand;
 import net.greeta.stock.customer.domain.event.CustomerCreatedEvent;
 import net.greeta.stock.customer.domain.mapper.CustomerDataMapper;
 import net.greeta.stock.customer.domain.ports.input.service.CustomerApplicationService;
 import net.greeta.stock.customer.domain.ports.output.message.publisher.CustomerMessagePublisher;
-import net.greeta.stock.customer.domain.create.CreateCustomerResponse;
+import net.greeta.stock.common.domain.dto.CreateCustomerResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;

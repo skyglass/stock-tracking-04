@@ -6,8 +6,8 @@ import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.common.domain.valueobject.OrderId;
 import net.greeta.stock.common.domain.valueobject.OrderStatus;
 import net.greeta.stock.common.domain.valueobject.PaymentOrderStatus;
-import net.greeta.stock.domain.dto.create.CreateOrderCommand;
-import net.greeta.stock.domain.dto.create.CreateOrderResponse;
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderResponse;
 import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.exception.OrderDomainException;
@@ -72,7 +72,7 @@ public class OrderApplicationServiceTest {
     public void init() {
         createOrderCommand = CreateOrderCommand.builder()
                 .customerId(CUSTOMER_ID)
-                .price(PRICE)
+                .amount(PRICE)
                 .build();
 
 
