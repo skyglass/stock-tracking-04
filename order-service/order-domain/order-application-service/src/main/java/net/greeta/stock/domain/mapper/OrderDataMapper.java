@@ -1,17 +1,17 @@
 package net.greeta.stock.domain.mapper;
 
+import net.greeta.stock.common.domain.dto.CreateOrderCommand;
+import net.greeta.stock.common.domain.dto.CreateOrderResponse;
+import net.greeta.stock.common.domain.dto.TrackOrderResponse;
+import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.common.domain.valueobject.Money;
 import net.greeta.stock.common.domain.valueobject.PaymentOrderStatus;
-import net.greeta.stock.common.domain.dto.CreateOrderCommand;
-import net.greeta.stock.common.domain.dto.CreateOrderResponse;
-import net.greeta.stock.domain.dto.message.CustomerModel;
-import net.greeta.stock.common.domain.dto.TrackOrderResponse;
+import net.greeta.stock.common.messaging.dto.CustomerModel;
 import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.entity.Order;
 import net.greeta.stock.domain.event.OrderCancelledEvent;
 import net.greeta.stock.domain.event.OrderCreatedEvent;
-import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

@@ -3,13 +3,12 @@ package net.greeta.stock.messaging.mapper;
 import debezium.payment.order_outbox.Value;
 import net.greeta.stock.common.domain.event.payload.PaymentOrderEventPayload;
 import net.greeta.stock.common.domain.valueobject.PaymentStatus;
-import net.greeta.stock.domain.dto.message.CustomerModel;
+import net.greeta.stock.common.messaging.dto.CustomerModel;
 import net.greeta.stock.domain.dto.message.PaymentResponse;
 import net.greeta.stock.common.domain.event.payload.OrderPaymentEventPayload;
 import net.greeta.stock.kafka.order.avro.model.CustomerAvroModel;
 import net.greeta.stock.kafka.order.avro.model.PaymentOrderStatus;
 import net.greeta.stock.kafka.order.avro.model.PaymentRequestAvroModel;
-import net.greeta.stock.kafka.order.avro.model.PaymentResponseAvroModel;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

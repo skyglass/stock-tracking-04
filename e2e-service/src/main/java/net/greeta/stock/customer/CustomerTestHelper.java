@@ -39,6 +39,12 @@ public class CustomerTestHelper {
         assertNotNull(customer.getCustomerId());
         String customerId = customer.getCustomerId().toString();
 
+        Boolean checkZeroBalance = RetryHelper.retry(() -> {
+            var test = paymentClient.getCustomerAccount(customerId);
+            return CalculationHelper.equals(test.getBalance(), BigDecimal.ZERO);
+        });
+        assertTrue(checkZeroBalance);
+
         CreateOrderCommand deposit = new CreateOrderCommand(customer.getCustomerId(), balance);
         final CreateOrderResponse depositSummary = orderClient.depositOrder(deposit);
         assertNotNull(depositSummary.getOrderTrackingId());
@@ -52,7 +58,7 @@ public class CustomerTestHelper {
 
         Boolean checkBalance = RetryHelper.retry(() -> {
             var test = paymentClient.getCustomerAccount(customerId);
-            return CalculationHelper.equalsToScale2(test.getBalance(), balance);
+            return CalculationHelper.equals(test.getBalance(), balance);
         });
         assertTrue(checkBalance);
 

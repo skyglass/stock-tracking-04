@@ -1,12 +1,12 @@
 package net.greeta.stock.domain;
 
-import net.greeta.stock.domain.dto.message.CustomerModel;
+import lombok.extern.slf4j.Slf4j;
+import net.greeta.stock.common.messaging.dto.CustomerModel;
 import net.greeta.stock.domain.entity.Customer;
 import net.greeta.stock.domain.exception.OrderDomainException;
 import net.greeta.stock.domain.mapper.OrderDataMapper;
 import net.greeta.stock.domain.ports.input.message.listener.customer.CustomerMessageListener;
 import net.greeta.stock.domain.ports.output.repository.CustomerRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j

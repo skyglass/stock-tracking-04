@@ -3,12 +3,16 @@ package net.greeta.stock.payment.domain.mapper;
 import net.greeta.stock.common.domain.valueobject.CustomerId;
 import net.greeta.stock.common.domain.valueobject.Money;
 import net.greeta.stock.common.domain.valueobject.OrderId;
+import net.greeta.stock.common.messaging.dto.CustomerModel;
+import net.greeta.stock.payment.domain.entity.CreditEntry;
 import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.dto.PaymentRequest;
 import net.greeta.stock.common.domain.event.payload.PaymentOrderEventPayload;
+import net.greeta.stock.payment.domain.valueobject.CreditEntryId;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
@@ -31,6 +35,14 @@ public class PaymentDataMapper {
                 .createdAt(paymentEvent.getCreatedAt())
                 .paymentStatus(paymentEvent.getPayment().getPaymentStatus().name())
                 .failureMessages(paymentEvent.getFailureMessages())
+                .build();
+    }
+
+    public CreditEntry customerModelToCreditEntry(CustomerModel customerModel) {
+        return CreditEntry.builder()
+                .creditEntryId(new CreditEntryId(UUID.randomUUID()))
+                .customerId(new CustomerId(UUID.fromString(customerModel.getId())))
+                .totalCreditAmount(new Money(BigDecimal.ZERO))
                 .build();
     }
 }

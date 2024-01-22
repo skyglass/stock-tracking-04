@@ -5,6 +5,7 @@ import net.greeta.stock.payment.domain.exception.PaymentApplicationServiceExcept
 import net.greeta.stock.payment.domain.exception.PaymentNotEnoughCreditException;
 import net.greeta.stock.payment.domain.ports.input.message.listener.PaymentRequestMessageListener;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class PaymentRequestMessageListenerImpl implements PaymentRequestMessageL
 
     private final PaymentRequestHelper paymentRequestHelper;
 
-    private static final int MAX_EXECUTION = 100;
+    private static final int MAX_EXECUTION = 20;
 
     public PaymentRequestMessageListenerImpl(PaymentRequestHelper paymentRequestHelper) {
         this.paymentRequestHelper = paymentRequestHelper;
@@ -35,11 +36,14 @@ public class PaymentRequestMessageListenerImpl implements PaymentRequestMessageL
             try {
                 result = func.apply(paymentRequest);
                 execution++;
-            } catch (OptimisticLockingFailureException | PaymentNotEnoughCreditException e) {
+            } catch (ConcurrencyFailureException | PaymentNotEnoughCreditException e) {
                 String exceptionName = e instanceof  OptimisticLockingFailureException ? "OptimisticLockingFailureException" : "PaymentNotEnoughCreditException";
-                log.warn("Caught {} exception in {} with message {}!. Retrying for order id {}!",
+                log.error("Caught {} exception in {} with message {}!. Retrying for order id {}!",
                         exceptionName, methodName, e.getMessage(), paymentRequest.getOrderId());
                 result = false;
+            } catch (Exception e) {
+                log.error("Caught exception: {} {}", e.getMessage(), e.getClass());
+                throw e;
             }
         } while(!result && execution < MAX_EXECUTION);
 

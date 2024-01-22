@@ -22,6 +22,10 @@
         </dependency>
         <dependency>
             <groupId>net.greeta.stock</groupId>
+            <artifactId>payment-application</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.greeta.stock</groupId>
             <artifactId>payment-dataaccess</artifactId>
         </dependency>
         <dependency>

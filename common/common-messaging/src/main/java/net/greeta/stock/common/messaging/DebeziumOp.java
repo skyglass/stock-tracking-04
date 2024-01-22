@@ -1,4 +1,4 @@
-package com.food.ordering.system.messaging;
+package net.greeta.stock.common.messaging;
 
 public enum DebeziumOp {
 

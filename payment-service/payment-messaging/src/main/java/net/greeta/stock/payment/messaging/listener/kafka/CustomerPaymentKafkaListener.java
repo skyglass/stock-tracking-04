@@ -1,10 +1,10 @@
-package net.greeta.stock.messaging.listener.kafka;
+package net.greeta.stock.payment.messaging.listener.kafka;
 
 import lombok.extern.slf4j.Slf4j;
-import net.greeta.stock.domain.ports.input.message.listener.customer.CustomerMessageListener;
 import net.greeta.stock.kafka.consumer.KafkaConsumer;
 import net.greeta.stock.kafka.order.avro.model.CustomerAvroModel;
-import net.greeta.stock.messaging.mapper.OrderMessagingDataMapper;
+import net.greeta.stock.payment.domain.ports.input.message.listener.customer.CustomerPaymentMessageListener;
+import net.greeta.stock.payment.messaging.mapper.PaymentMessagingDataMapper;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -15,19 +15,19 @@ import java.util.List;
 
 @Slf4j
 @Component
-public class CustomerKafkaListener implements KafkaConsumer<CustomerAvroModel> {
+public class CustomerPaymentKafkaListener implements KafkaConsumer<CustomerAvroModel> {
 
-    private final CustomerMessageListener customerMessageListener;
-    private final OrderMessagingDataMapper orderMessagingDataMapper;
+    private final CustomerPaymentMessageListener customerMessageListener;
+    private final PaymentMessagingDataMapper paymentMessagingDataMapper;
 
-    public CustomerKafkaListener(CustomerMessageListener customerMessageListener,
-                                 OrderMessagingDataMapper orderMessagingDataMapper) {
+    public CustomerPaymentKafkaListener(CustomerPaymentMessageListener customerMessageListener,
+                                        PaymentMessagingDataMapper paymentMessagingDataMapper) {
         this.customerMessageListener = customerMessageListener;
-        this.orderMessagingDataMapper = orderMessagingDataMapper;
+        this.paymentMessagingDataMapper = paymentMessagingDataMapper;
     }
 
     @Override
-    @KafkaListener(id = "${kafka-consumer-config.customer-group-id}", topics = "${order-service.customer-topic-name}")
+    @KafkaListener(id = "${kafka-consumer-config.customer-group-id}", topics = "${payment-service.customer-topic-name}")
     public void receive(@Payload List<CustomerAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
@@ -39,7 +39,7 @@ public class CustomerKafkaListener implements KafkaConsumer<CustomerAvroModel> {
                 offsets.toString());
 
         messages.forEach(customerAvroModel ->
-                customerMessageListener.customerCreated(orderMessagingDataMapper
+                customerMessageListener.customerCreated(paymentMessagingDataMapper
                         .customerAvroModeltoCustomerModel(customerAvroModel)));
     }
 }

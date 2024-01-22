@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "payment")
 public interface PaymentClient {
 
-    @GetMapping("/customer-account/{customerId}")
+    @GetMapping("/{customerId}")
     public CustomerAccountDto getCustomerAccount(@PathVariable String customerId);
 
 }

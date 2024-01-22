@@ -74,10 +74,14 @@ public class PaymentRequestHelper {
         if (failureMessages.isEmpty()) {
             int version = creditEntry.getVersion();
             creditEntryRepository.detach(payment.getCustomerId());
-            creditEntry = getCreditEntry(payment.getCustomerId());
-            isSucceeded = version == creditEntry.getVersion();
+            CreditEntry oldCreditEntry = getCreditEntry(payment.getCustomerId());
+            isSucceeded = version == oldCreditEntry.getVersion();
         } else {
             isSucceeded = false;
+        }
+
+        for (String errorMessage: failureMessages) {
+            log.error("Failure message: {}", failureMessages);
         }
 
         if (isSucceeded) {

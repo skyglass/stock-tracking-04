@@ -1,6 +1,6 @@
 package net.greeta.stock.domain.ports.input.message.listener.customer;
 
-import net.greeta.stock.domain.dto.message.CustomerModel;
+import net.greeta.stock.common.messaging.dto.CustomerModel;
 
 public interface CustomerMessageListener {
 

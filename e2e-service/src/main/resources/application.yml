@@ -19,6 +19,8 @@ spring:
             url: http://localhost:9000/customer
           payment:
             url: http://localhost:9000/payment
+          payment2:
+            url: http://localhost:9000/payment2
           oauth2:
             url: http://localhost:8080
 

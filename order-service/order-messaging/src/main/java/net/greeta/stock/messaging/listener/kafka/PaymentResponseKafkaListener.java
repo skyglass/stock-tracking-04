@@ -1,6 +1,6 @@
 package net.greeta.stock.messaging.listener.kafka;
 
-import com.food.ordering.system.messaging.DebeziumOp;
+import net.greeta.stock.common.messaging.DebeziumOp;
 import debezium.payment.order_outbox.Envelope;
 import debezium.payment.order_outbox.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +15,6 @@ import org.postgresql.util.PSQLState;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.annotation.PartitionOffset;
-import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;

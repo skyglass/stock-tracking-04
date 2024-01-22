@@ -17,7 +17,7 @@ public class PaymentController {
         this.paymentApplicationService = paymentApplicationService;
     }
 
-    @GetMapping(path = "/customer-account/{customerId}")
+    @GetMapping("/{customerId}")
     public CustomerAccountDto getCustomerAccount(@PathVariable String customerId) {
         return paymentApplicationService.getCustomerAccount(customerId);
     }

@@ -123,7 +123,7 @@ kafka-consumer-config:
   specific-avro-reader: true
   batch-listener: true
   auto-startup: true
-  concurrency-level: 3
+  concurrency-level: 1
   session-timeout-ms: 10000
   heartbeat-interval-ms: 3000
   max-poll-interval-ms: 300000

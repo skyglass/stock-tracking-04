@@ -1,4 +1,4 @@
-package net.greeta.stock.domain.dto.message;
+package net.greeta.stock.common.messaging.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
