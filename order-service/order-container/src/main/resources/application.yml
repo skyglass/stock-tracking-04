@@ -99,8 +99,8 @@ kafka-config:
   bootstrap-servers: "stock-kafka1:29092,stock-kafka2:29093"
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://schema-registry:8081
-  num-of-partitions: 1
-  replication-factor: 1
+  num-of-partitions: 2
+  replication-factor: 2
 
 kafka-producer-config:
   key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
@@ -123,7 +123,7 @@ kafka-consumer-config:
   specific-avro-reader: true
   batch-listener: true
   auto-startup: true
-  concurrency-level: 1
+  concurrency-level: 2
   session-timeout-ms: 10000
   heartbeat-interval-ms: 3000
   max-poll-interval-ms: 300000

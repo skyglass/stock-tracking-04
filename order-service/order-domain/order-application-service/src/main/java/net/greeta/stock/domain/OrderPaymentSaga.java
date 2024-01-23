@@ -10,6 +10,7 @@ import net.greeta.stock.domain.event.OrderPaidEvent;
 import net.greeta.stock.domain.exception.OrderNotFoundException;
 import net.greeta.stock.domain.mapper.OrderDataMapper;
 import net.greeta.stock.domain.outbox.model.payment.OrderPaymentOutboxMessage;
+import net.greeta.stock.domain.outbox.scheduler.payment.PaymentDepositOutboxHelper;
 import net.greeta.stock.domain.outbox.scheduler.payment.PaymentOutboxHelper;
 import net.greeta.stock.domain.ports.output.repository.OrderRepository;
 import net.greeta.stock.saga.SagaStatus;
@@ -31,17 +32,20 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
     private final OrderDomainService orderDomainService;
     private final OrderRepository orderRepository;
     private final PaymentOutboxHelper paymentOutboxHelper;
+    private final PaymentDepositOutboxHelper paymentDepositOutboxHelper;
     private final OrderSagaHelper orderSagaHelper;
     private final OrderDataMapper orderDataMapper;
 
     public OrderPaymentSaga(OrderDomainService orderDomainService,
                             OrderRepository orderRepository,
                             PaymentOutboxHelper paymentOutboxHelper,
+                            PaymentDepositOutboxHelper paymentDepositOutboxHelper,
                             OrderSagaHelper orderSagaHelper,
                             OrderDataMapper orderDataMapper) {
         this.orderDomainService = orderDomainService;
         this.orderRepository = orderRepository;
         this.paymentOutboxHelper = paymentOutboxHelper;
+        this.paymentDepositOutboxHelper = paymentDepositOutboxHelper;
         this.orderSagaHelper = orderSagaHelper;
         this.orderDataMapper = orderDataMapper;
     }
@@ -50,6 +54,12 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
     @Transactional
     public void process(PaymentResponse paymentResponse) {
         Optional<OrderPaymentOutboxMessage> orderPaymentOutboxMessageResponse =
+                isDepositPayment(paymentResponse)
+                ?
+                paymentDepositOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(
+                        UUID.fromString(paymentResponse.getSagaId()),
+                        SagaStatus.STARTED)
+                :
                 paymentOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(
                         UUID.fromString(paymentResponse.getSagaId()),
                         SagaStatus.STARTED);
@@ -65,8 +75,13 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
 
         SagaStatus sagaStatus = orderSagaHelper.orderStatusToSagaStatus(domainEvent.getOrder().getOrderStatus());
 
-        paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
-                domainEvent.getOrder().getOrderStatus(), sagaStatus));
+        if (isDepositPayment(paymentResponse)) {
+            paymentDepositOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
+                    domainEvent.getOrder().getOrderStatus(), sagaStatus));
+        } else {
+            paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
+                    domainEvent.getOrder().getOrderStatus(), sagaStatus));
+        }
 
         log.info("Order with id: {} is paid", domainEvent.getOrder().getId().getValue());
     }
@@ -76,7 +91,12 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
     public void rollback(PaymentResponse paymentResponse) {
 
         Optional<OrderPaymentOutboxMessage> orderPaymentOutboxMessageResponse =
-                paymentOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(
+                isDepositPayment(paymentResponse) ?
+                        paymentDepositOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(
+                                UUID.fromString(paymentResponse.getSagaId()),
+                                getCurrentSagaStatus(paymentResponse.getPaymentStatus()))
+                        :
+                        paymentOutboxHelper.getPaymentOutboxMessageBySagaIdAndSagaStatus(
                         UUID.fromString(paymentResponse.getSagaId()),
                         getCurrentSagaStatus(paymentResponse.getPaymentStatus()));
 
@@ -91,8 +111,13 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
 
         SagaStatus sagaStatus = orderSagaHelper.orderStatusToSagaStatus(order.getOrderStatus());
 
-        paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
-                order.getOrderStatus(), sagaStatus));
+        if (isDepositPayment(paymentResponse)) {
+            paymentDepositOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
+                    order.getOrderStatus(), sagaStatus));
+        } else {
+            paymentOutboxHelper.save(getUpdatedPaymentOutboxMessage(orderPaymentOutboxMessage,
+                    order.getOrderStatus(), sagaStatus));
+        }
 
         log.info("Order with id: {} is cancelled", order.getId().getValue());
     }
@@ -139,5 +164,9 @@ public class OrderPaymentSaga implements SagaStep<PaymentResponse> {
         orderDomainService.cancelOrder(order, paymentResponse.getFailureMessages());
         orderRepository.save(order);
         return order;
+    }
+
+    private boolean isDepositPayment(PaymentResponse paymentResponse) {
+        return paymentResponse.getPrice().signum() < 0;
     }
 }

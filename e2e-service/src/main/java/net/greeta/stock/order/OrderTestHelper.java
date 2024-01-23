@@ -32,8 +32,8 @@ public class OrderTestHelper {
     @Async
     public CompletableFuture<CreateOrderResponse> createAsyncDeposit(String customerId, BigDecimal amount, int hash) {
         log.info("Creating deposit order with amount {} for customer {}", amount, customerId);
-        CreateOrderCommand order = new CreateOrderCommand(UUID.fromString(customerId), amount.negate());
-        return CompletableFuture.completedFuture(createOrder(order, hash));
+        CreateOrderCommand order = new CreateOrderCommand(UUID.fromString(customerId), amount);
+        return CompletableFuture.completedFuture(createDepositOrder(order, hash));
     }
 
     public CreateOrderResponse createOrder(String customerId, BigDecimal amount) {
@@ -50,6 +50,16 @@ public class OrderTestHelper {
             return order2Client.createOrder(order);
         } else {
             return order3Client.createOrder(order);
+        }
+    }
+
+    private CreateOrderResponse createDepositOrder(CreateOrderCommand order, int hash) {
+        if (hash % 3 == 0) {
+            return orderClient.depositOrder(order);
+        } else if (hash % 3 == 1) {
+            return order2Client.depositOrder(order);
+        } else {
+            return order3Client.depositOrder(order);
         }
     }
 

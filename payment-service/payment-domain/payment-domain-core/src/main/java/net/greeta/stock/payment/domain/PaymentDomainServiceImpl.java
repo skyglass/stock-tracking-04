@@ -9,6 +9,7 @@ import net.greeta.stock.payment.domain.entity.Payment;
 import net.greeta.stock.payment.domain.event.PaymentCompletedEvent;
 import net.greeta.stock.payment.domain.event.PaymentEvent;
 import net.greeta.stock.payment.domain.event.PaymentFailedEvent;
+import net.greeta.stock.payment.domain.exception.CreditHistoryInvalidStateException;
 import net.greeta.stock.payment.domain.exception.PaymentNotEnoughCreditException;
 import net.greeta.stock.payment.domain.exception.PaymentNotFoundException;
 import net.greeta.stock.payment.domain.valueobject.CreditHistoryId;
@@ -86,8 +87,8 @@ public class PaymentDomainServiceImpl implements PaymentDomainService {
         if (!creditEntry.getTotalCreditAmount().equals(totalCreditHistory.subtract(totalDebitHistory))) {
             log.error("Credit history total is not equal to current credit for customer id: {}!",
                     creditEntry.getCustomerId().getValue());
-            failureMessages.add("Credit history total is not equal to current credit for customer id: " +
-                    creditEntry.getCustomerId().getValue() + "!");
+            throw new CreditHistoryInvalidStateException("Credit history total is not equal to current credit for customer id: " +
+                    creditEntry.getCustomerId().getValue());
         }
     }
 

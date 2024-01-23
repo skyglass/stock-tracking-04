@@ -6,6 +6,7 @@ import net.greeta.stock.payment.domain.exception.PaymentNotEnoughCreditException
 import net.greeta.stock.payment.domain.ports.input.message.listener.PaymentRequestMessageListener;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.ConcurrencyFailureException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -15,40 +16,36 @@ import java.util.function.Function;
 @Service
 public class PaymentRequestMessageListenerImpl implements PaymentRequestMessageListener {
 
-    private final PaymentRequestHelper paymentRequestHelper;
+    private static final String CANCEL_PAYMENT_METHOD = "cancelPayment";
 
-    private static final int MAX_EXECUTION = 20;
+    private final PaymentRetryHelper paymentRetryHelper;
 
-    public PaymentRequestMessageListenerImpl(PaymentRequestHelper paymentRequestHelper) {
-        this.paymentRequestHelper = paymentRequestHelper;
+    public PaymentRequestMessageListenerImpl(PaymentRetryHelper paymentRetryHelper) {
+        this.paymentRetryHelper = paymentRetryHelper;
     }
 
     @Override
     public void completePayment(PaymentRequest paymentRequest) {
-        processPayment(paymentRequestHelper::persistPayment, paymentRequest, "completePayment");
+        processPayment(paymentRetryHelper::persistPayment, paymentRequest, "completePayment");
+    }
+
+    @Override
+    public void cancelPayment(PaymentRequest paymentRequest) {
+        processPayment(paymentRetryHelper::persistCancelPayment, paymentRequest, CANCEL_PAYMENT_METHOD);
     }
 
     private void processPayment(Function<PaymentRequest, Boolean> func, PaymentRequest paymentRequest, String methodName) {
-        int execution = 1;
-        boolean result;
-        do {
-            log.info("Executing {} operation for {} time for order id {}", methodName, execution, paymentRequest.getOrderId());
-            try {
-                result = func.apply(paymentRequest);
-                execution++;
-            } catch (ConcurrencyFailureException | PaymentNotEnoughCreditException e) {
-                String exceptionName = e instanceof  OptimisticLockingFailureException ? "OptimisticLockingFailureException" : "PaymentNotEnoughCreditException";
-                log.error("Caught {} exception in {} with message {}!. Retrying for order id {}!",
-                        exceptionName, methodName, e.getMessage(), paymentRequest.getOrderId());
-                result = false;
-            } catch (Exception e) {
-                log.error("Caught exception: {} {}", e.getMessage(), e.getClass());
-                throw e;
+        log.info("Executing {} operation for order id {}", methodName, paymentRequest.getOrderId());
+        try {
+            func.apply(paymentRequest);
+        } catch (Exception e) {
+            log.error("Caught exception: {} {}", e.getMessage(), e.getClass());
+            if (CANCEL_PAYMENT_METHOD.equals(methodName)) {
+                throw new PaymentApplicationServiceException("Could not complete " + methodName
+                        + " operation. Throwing exception!: " + e.getClass() + ": " + e.getMessage());
             }
-        } while(!result && execution < MAX_EXECUTION);
-
-        if (!result) {
-            throw new PaymentApplicationServiceException("Could not complete " + methodName + " operation. Throwing exception!");
+            log.info("Cancelling payment for order id: {}", paymentRequest.getOrderId());
+            cancelPayment(paymentRequest);
         }
     }
 

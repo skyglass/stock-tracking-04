@@ -13,6 +13,8 @@ import net.greeta.stock.payment.domain.valueobject.CreditEntryId;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 
 @Component
@@ -35,6 +37,18 @@ public class PaymentDataMapper {
                 .createdAt(paymentEvent.getCreatedAt())
                 .paymentStatus(paymentEvent.getPayment().getPaymentStatus().name())
                 .failureMessages(paymentEvent.getFailureMessages())
+                .build();
+    }
+
+    public PaymentOrderEventPayload paymentToOrderEventPayload(Payment payment) {
+        return PaymentOrderEventPayload.builder()
+                .paymentId(payment.getId().getValue().toString())
+                .customerId(payment.getCustomerId().getValue().toString())
+                .orderId(payment.getOrderId().getValue().toString())
+                .price(payment.getPrice().getAmount())
+                .createdAt(payment.getCreatedAt())
+                .paymentStatus(payment.getPaymentStatus().name())
+                .failureMessages(new ArrayList<>())
                 .build();
     }
 

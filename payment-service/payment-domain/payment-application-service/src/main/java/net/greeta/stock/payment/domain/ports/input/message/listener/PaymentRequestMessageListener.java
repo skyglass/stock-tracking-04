@@ -5,4 +5,6 @@ import net.greeta.stock.payment.domain.dto.PaymentRequest;
 public interface PaymentRequestMessageListener {
 
     void completePayment(PaymentRequest paymentRequest);
+
+    void cancelPayment(PaymentRequest paymentRequest);
 }

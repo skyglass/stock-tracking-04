@@ -25,5 +25,6 @@ public class OrderTestDataService extends TestDataService {
         executeString("DELETE FROM \"order\".orders");
         executeString("DELETE FROM \"order\".customers");
         executeString("DELETE FROM \"order\".payment_outbox");
+        executeString("DELETE FROM \"order\".payment_deposit_outbox");
     }
 }

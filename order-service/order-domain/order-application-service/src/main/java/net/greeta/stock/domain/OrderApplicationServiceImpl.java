@@ -32,7 +32,7 @@ class OrderApplicationServiceImpl implements OrderApplicationService {
     @Override
     public CreateOrderResponse depositOrder(CreateOrderCommand createOrderCommand) {
         CreateOrderCommand deposit = new CreateOrderCommand(createOrderCommand.getCustomerId(), createOrderCommand.getAmount().negate());
-        return orderCreateCommandHandler.createOrder(deposit);
+        return orderCreateCommandHandler.createDepositOrder(deposit);
     }
 
     @Override

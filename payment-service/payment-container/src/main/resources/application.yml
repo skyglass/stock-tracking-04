@@ -86,6 +86,7 @@ openapi:
 
 payment-service:
   payment-request-topic-name: debezium.order.payment_outbox
+  payment-deposit-request-topic-name: debezium.order.payment_deposit_outbox
   payment-response-topic-name: debezium.payment.order_outbox
   customer-topic-name: customer
 
@@ -94,8 +95,8 @@ kafka-config:
   bootstrap-servers: "stock-kafka1:29092,stock-kafka2:29093"
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://schema-registry:8081
-  num-of-partitions: 1
-  replication-factor: 1
+  num-of-partitions: 2
+  replication-factor: 2
 
 kafka-producer-config:
   key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
@@ -112,6 +113,7 @@ kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
   payment-consumer-group-id: payment-topic-consumer
+  payment-deposit-consumer-group-id: payment-deposit-topic-consumer
   customer-group-id: customer-payment-topic-consumer
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader

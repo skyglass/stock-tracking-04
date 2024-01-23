@@ -11,4 +11,7 @@ public interface Order2Client {
 
     @PostMapping("/")
     public CreateOrderResponse createOrder(@RequestBody CreateOrderCommand order);
+
+    @PostMapping("/deposit")
+    public CreateOrderResponse depositOrder(@RequestBody CreateOrderCommand order);
 }
