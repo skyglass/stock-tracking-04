@@ -79,24 +79,7 @@ sh docker-app-restart.sh order
 
 - for more details see: [E2E Testing Pipeline for Spring Boot Microservices using OpenFeign Client and Github Actions](https://www.linkedin.com/pulse/e2e-testing-pipeline-spring-boot-microservices-using-openfeign/)
 
-- Warning! In case any spring boot docker image crashed, start it again:
-
-```
-docker-compose -f docker-app-compose.yml up -d
-```
-
-- Warning! In case the tests still fail, try to restart spring boot docker images:
-
-```
-docker-compose -f docker-app-compose.yml down (optional
-docker-compose -f docker-app-compose.yml up -d
-```
-
-- Warning! In case you still have problems, try to restart all images:
-
-```
-sh docker-restart.sh
-```
+- Warning! In case of any problems with Docker Environment, see `Docker Troubleshooting` section
 
 - Use `Kafka UI` to monitor Topics, Kafka Connectors, Producers, Consumers and Event Messages: http://localhost:8024/
 
@@ -111,6 +94,28 @@ sh docker-restart.sh
 - Warning! Sometimes switching between Swagger UI pages doesn't refresh Swagger UI completely and you might see wrong REST endpoints: just refresh the page and continue
 
 - For Swagger UI `POST` requests: click `Authorize` and use `admin/admin` or `user/user` for credentials (`clientId` should be `stock-app`)
+
+
+### Docker Troubleshooting
+
+- In case of any problems, start crashed spring boot containers again:
+
+```
+docker-compose -f docker-app-compose.yml up -d
+```
+
+- In case the tests still fail, try to restart all spring boot containers:
+
+```
+docker-compose -f docker-app-compose.yml down
+docker-compose -f docker-app-compose.yml up -d
+```
+
+- In case you still have problems, try to restart all images:
+
+```
+sh docker-restart.sh
+```
 
 
 ### Remote Debugging
