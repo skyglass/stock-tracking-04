@@ -79,6 +79,25 @@ sh docker-app-restart.sh order
 
 - for more details see: [E2E Testing Pipeline for Spring Boot Microservices using OpenFeign Client and Github Actions](https://www.linkedin.com/pulse/e2e-testing-pipeline-spring-boot-microservices-using-openfeign/)
 
+- Warning! In case any spring boot docker image crashed, start it again:
+
+```
+docker-compose -f docker-app-compose.yml up -d
+```
+
+- Warning! In case the tests still fail, try to restart spring boot docker images:
+
+```
+docker-compose -f docker-app-compose.yml down (optional
+docker-compose -f docker-app-compose.yml up -d
+```
+
+- Warning! In case you still have problems, try to restart all images:
+
+```
+sh docker-restart.sh
+```
+
 - Use `Kafka UI` to monitor Topics, Kafka Connectors, Producers, Consumers and Event Messages: http://localhost:8024/
 
 - Use `PostgreSQL` Database Client (for example DBeaver) to monitor `customer` `order` and `payment` databases
