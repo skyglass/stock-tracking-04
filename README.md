@@ -1,6 +1,6 @@
 ### 📖 Concurrency and Resiliency Patterns in Saga Transactions for Spring Boot Microservices
 
-#### ✅ Outbox Pattern Saga, DDD, CQRS, Clean Architecture, Kafka Streaming, Debezium CDC, PostgreSQL, Optimistic Locking
+#### ✅ Outbox Pattern, Saga, DDD, CQRS, Clean Architecture, Kafka Streaming, Debezium CDC, PostgreSQL, Optimistic Locking
 #### ✅ Safe Idempotent Retry Transactions with Optimistic Locking and Spring Retry
 #### ✅ Domain-Driven Design, Event Sourcing, CQRS, Clean Code, Hexagonal Architecture
 #### ✅ E2E Concurrency Testing Framework with Completable Futures using Spring Cloud OpenFeign
