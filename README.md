@@ -1,12 +1,13 @@
 ### 📖 Concurrency and Resiliency Patterns in Saga Transactions for Spring Boot Microservices
 
-#### ✅ Outbox Pattern Concurrency with Kafka Streams and Debezium CDC PostgreSQL Kafka Connect
-#### ✅ Safe Idempotent Retry Transactions with Spring Retry
+#### ✅ Outbox Pattern Saga, DDD, CQRS, Clean Architecture, Kafka Streaming, Debezium CDC, PostgreSQL, Optimistic Locking
+#### ✅ Safe Idempotent Retry Transactions with Optimistic Locking and Spring Retry
+#### ✅ Domain-Driven Design, Event Sourcing, CQRS, Clean Code, Hexagonal Architecture
 #### ✅ E2E Concurrency Testing Framework with Completable Futures using Spring Cloud OpenFeign
 
 <ul style="list-style-type:disc">
-    <li>📖 This <b>Stock Tracking Platform with Kafka Streams and Debezium CDC Connect</b> provides fully functional Development Environment:</li>
-    <li>📖 <b>Event-Driven Spring Boot Microservices</b> with Kafka Streams, Debezium CDC PostgreSQL Kafka Connect and Outbox Pattern</li>
+    <li>📖 This <b>Payment Processing Platform with Clean Architecture, Kafka Streaming and Debezium CDC Connect</b> provides fully functional Development Environment:</li>
+    <li>📖 <b>Event-Driven Spring Boot Microservices</b> with Clean Architecture, Kafka Streaming, Debezium CDC PostgreSQL Kafka Connect and Outbox Pattern</li>
     <li>📖 <b>Swagger UI Gateway</b> with Keycloak Authorization</li>
     <li>📖 <b>E2E Testing Service</b> with Spring Cloud OpenFeign REST Client</li>
     <li>📖 Local <b>Docker</b> Development Environment</li>
@@ -19,9 +20,12 @@
     <li>✅ <b>Event-Driven Microservices</b></li>
     <li>✅ <b>Kafka Event Streaming</b></li>
     <li>✅ <b>Kafka Event Store</b></li>
+    <li>✅ <b>Kafka Avro Schema Registry</b></li>
+    <li>✅ <b>DDD, Clean Code, Hexagonal Architecture</b></li>
+    <li>✅ <b>Event Sourcing, CQRS, Saga with Outbox Pattern, Kafka, Debezium and PostgreSQL</b></li>
     <li>✅ <b>Debezium Change Data Capture PostgreSQL Kafka Connect</b></li>
-    <li>✅ <b>Outbox Pattern Transactions with Debezium and PostgreSQL Database</b></li>
-    <li>✅ <b>Safe Idempotent Retry Transactions with Spring Retry</b></li>
+    <li>✅ <b>Reliable Outbox Pattern Saga Transactions with Kafka, Debezium and PostgreSQL</b></li>
+    <li>✅ <b>Safe Idempotent Retry Transactions with Optimistic Locking and Spring Retry</b></li>
     <li>✅ <b>Kafka UI</b></li>
     <li>✅ <b>Query Projection with PostgreSQL Database</b></li>
     <li>✅ <b>Keycloak Oauth2 Authorization Server</b></li>
@@ -35,6 +39,8 @@
 
 ### 📖 Links
 
+- [Stock Tracking Platform with Outbox Pattern, Kafka Event Streaming, Debezium CDC Connector and PostgreSQL](https://github.com/skyglass/stock-tracking-03)
+- [Udemy Course: Microservices: Clean Architecture, DDD, SAGA, Outbox & Kafka](https://www.udemy.com/course/microservices-clean-architecture-ddd-saga-outbox-kafka-kubernetes/)
 - [Video Streaming Platform with Debezium CDC Kafka Connector, Kafka Event Streaming, Minio File Storage and FFmpeg Video Processing](https://github.com/greeta-video-01/video-api)
 - [Stock Tracking Platform with Axon Event Sourcing, CQRS and Saga Transactions](https://github.com/greeta-stock-02/stock-api)
 - [E2E Testing Pipeline for Spring Boot Microservices using OpenFeign Client and Github Actions](https://www.linkedin.com/pulse/e2e-testing-pipeline-spring-boot-microservices-using-openfeign/)
@@ -49,8 +55,6 @@ sh docker-start.sh
 
 - this script will build docker images and start environment with your code changes
 
-- Warning! Make sure that Axon Server is initialized! (see `Axon Server Troubleshooting` below for more information)
-
 ```
 sh docker-app-restart.sh order
 ```
@@ -63,7 +67,7 @@ sh docker-app-restart.sh order
 
 - make sure you started local docker environment with `sh docker-start.sh` command
 
-- run commands in `./command.txt` (Debezium Kafka PostgreSQL connectors)
+- run `sh debezium-start.sh` (Debezium Kafka PostgreSQL connectors)
 
 - open http://localhost:9000 in your Browser and make sure that Swagger UI is working
 
@@ -77,7 +81,7 @@ sh docker-app-restart.sh order
 
 - Use `Kafka UI` to monitor Topics, Kafka Connectors, Producers, Consumers and Event Messages: http://localhost:8024/
 
-- Use `PostgreSQL` Database Client (for example DBeaver) to monitor `order-db` and `product-db` databases
+- Use `PostgreSQL` Database Client (for example DBeaver) to monitor `customer` `order` and `payment` databases
 
 - Warning! Before each E2E test, PostgreSQL databases are completely reset: all data is clean before running each E2E Test
 
@@ -85,11 +89,7 @@ sh docker-app-restart.sh order
 
 - Make sure that Keycloak Server is running as part of your Local Docker Environment: http://localhost:8080 (otherwise OpenFeign REST API authorized requests will not work)
 
-- Warning! If Swagger UI fails to load on the first try, please, refresh the page!
-
 - Warning! Sometimes switching between Swagger UI pages doesn't refresh Swagger UI completely and you might see wrong REST endpoints: just refresh the page and continue
-
-- Warning! Sometimes Swagger UI REST endpoints return `504 Gateway Timeout`, just retry the REST API endpoint again
 
 - For Swagger UI `POST` requests: click `Authorize` and use `admin/admin` or `user/user` for credentials (`clientId` should be `stock-app`)
 
