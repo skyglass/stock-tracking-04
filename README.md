@@ -111,7 +111,7 @@ docker-compose -f docker-app-compose.yml down
 docker-compose -f docker-app-compose.yml up -d
 ```
 
-- In case you still have problems, try to restart all images:
+- In case you still have problems, try to restart all docker containers:
 
 ```
 sh docker-restart.sh
