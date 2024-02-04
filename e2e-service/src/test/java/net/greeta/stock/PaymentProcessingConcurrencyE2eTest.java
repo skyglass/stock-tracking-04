@@ -59,7 +59,6 @@ public class PaymentProcessingConcurrencyE2eTest extends E2eTest {
 
         int numberOfOrders = 15;
         List<CompletableFuture<CreateOrderResponse>> createdOrders = new ArrayList<>();
-        // Kick of multiple, asynchronous lookups
         for (int i = 0; i < numberOfOrders; i++) {
             CompletableFuture<CreateOrderResponse> orderSummary = orderTestHelper.createAsyncOrder(customerId, BigDecimal.valueOf(2.0), i);
             createdOrders.add(orderSummary);
@@ -67,7 +66,6 @@ public class PaymentProcessingConcurrencyE2eTest extends E2eTest {
 
         int numberOfDepositUpdates = 5;
         List<CompletableFuture<CreateOrderResponse>> addedDeposits = new ArrayList<>();
-        // Kick of multiple, asynchronous lookups
         for (int i = 0; i < numberOfDepositUpdates; i++) {
             CompletableFuture<CreateOrderResponse> addDepositResult = orderTestHelper.createAsyncDeposit(customerId, BigDecimal.valueOf(2.0), i);
             addedDeposits.add(addDepositResult);
